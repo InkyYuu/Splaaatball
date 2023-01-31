@@ -1,0 +1,2 @@
+'red','blue','green','cyan','pink','purple','yellow','orange','#000066','#AA1133'
+'rouge','bleu','vert','cyan','rose','violet','jaune','orange','navy','bordeau'
