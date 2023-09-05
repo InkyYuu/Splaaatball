@@ -1,6 +1,6 @@
 README - SPLAAATBALL [V.3.25]
 Par BREDEAU Kellian
-et CHEVALIER Héléna
+et CHEVALIER Hélèna
 
 #Description
 Splaaatball est un projet python réalisé lors de notre premier semestre de BUT informatique à Gustave-Eiffel. 
