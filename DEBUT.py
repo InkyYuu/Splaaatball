@@ -90,6 +90,14 @@ def debut():
     rectangle(765,250,1855,300,remplissage='orangered')
     texte(1310,275,'MENU DES VARIANTES',ancrage='center',police='Franklin Gothic Medium Cond')   
 
+    for key, item in variants.items():
+        bord = 'lime green' if item["actif"] else 'black'
+        x, y = item['x'], item['y']    
+        rectangle(x,y,x+320,y+275,'black',remplissage=couleurboutonsVar,epaisseur=10)
+        texte(x+160,y+25,key,ancrage='center',police=policevar,taille=20)
+        image(x+160,y+125, path.join('.','icones',f"icone-{key}-couleur-reduit.png"),'center')
+        texte(x+160,y+235,item['description'],taille=10,ancrage='center',police=policevar)
+
     #====================================IFS===========================================================================================================================
     while menu == True :
             cercle((largeurFenetre/2)-125,57,50,lstcolo[a],lstcolo[a])
@@ -104,10 +112,7 @@ def debut():
             for key, item in variants.items():
                 bord = 'lime green' if item["actif"] else 'black'
                 x, y = item['x'], item['y']    
-                rectangle(x,y,x+320,y+275,bord,remplissage=couleurboutonsVar,epaisseur=10)
-                texte(x+160,y+25,key,ancrage='center',police=policevar,taille=20)
-                image(x+160,y+125, path.join('.','icones',f"icone-{key}-couleur-reduit.png"),'center')
-                texte(x+160,y+235,item['description'],taille=10,ancrage='center',police=policevar)
+                rectangle(x,y,x+320,y+275,bord,epaisseur=10)
 
             #=======================================================LES CONDITIONNELLES=======================================================================
             rectangle(65,50,565,120, 'black', 'SandyBrown', epaisseur=2)
