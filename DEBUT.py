@@ -4,7 +4,6 @@ from random import *
 from upemtk import *
 from CHOIXSAVE import *
 
-
 def debut():
     hauteurFenetre = 1080
     largeurFenetre = 1920

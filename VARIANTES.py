@@ -5,10 +5,13 @@ from random import *
 from math import *
 from time import *
 from os import path
+from functools import lru_cache
 
+from BOULE import Boule
 # ==================================================================================== VARIABLES ====================================================================== #
 policevar = 'Franklin Gothic Medium Cond'
 # ==================================================================================== FONCTIONS ====================================================================== #
+
 def sauvegarder (couleurJ1, couleurJ2, lstJ1, lstJ2, tour, fin_partie, variantes, lstObs, banqueJ1, banqueJ2, PasseJ1) :
 
     rectangle(600,125,1320,250,'black','white',8,'info_terminaison')
@@ -49,6 +52,15 @@ def sauvegarder (couleurJ1, couleurJ2, lstJ1, lstJ2, tour, fin_partie, variantes
                     fichier.truncate()
                 ferme_fenetre()
                 quit()
+
+def calcul_score_new(tuple_boule) -> int :
+    score = 0
+    for boule in tuple_boule :
+        for x in range (int(boule.x - boule.rayon),int(boule.x + boule.rayon)+1):
+            for y in range (int(boule.y - boule.rayon),int(boule.y + boule.rayon)+1):
+                if distance(boule, x, y) < boule.rayon :
+                    score += 1
+    return score
 
 def calcul_score (liste_boule) -> int:
     """

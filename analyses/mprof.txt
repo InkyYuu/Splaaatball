@@ -1,0 +1,248 @@
+Filename: SPLAAATBALL.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+   198     27.5 MiB     27.5 MiB           1   @profile
+   199                                         def main():
+   200
+   201                                             #Fenêtres
+   202                                             global hauteurFenetre, largeurFenetre
+   203     27.5 MiB      0.0 MiB           1       hauteurFenetre = 1030
+   204     27.5 MiB      0.0 MiB           1       largeurFenetre = 1920
+   205
+   206                                             #Jeu
+   207                                             global victoire, tour, lst_boule_J1, lst_boule_J2, scoreJ1, scoreJ2, sauvegarde, liste_obstacle
+   208     27.5 MiB      0.0 MiB           1       victoire = False
+   209     27.5 MiB      0.0 MiB           1       tour = 0
+   210     27.5 MiB      0.0 MiB           1       lst_boule_J1 = []
+   211     27.5 MiB      0.0 MiB           1       lst_boule_J2 = []
+   212     27.5 MiB      0.0 MiB           1       scoreJ1 = []
+   213     27.5 MiB      0.0 MiB           1       scoreJ2 = []
+   214     27.5 MiB      0.0 MiB           1       sauvegarde = False
+   215     27.5 MiB      0.0 MiB           1       liste_obstacle = []
+   216     27.5 MiB      0.0 MiB           1       policevar = 'Franklin Gothic Medium Cond'
+   217
+   218     27.5 MiB      0.0 MiB           1       lien = path.join('.','save','save.txt')
+   219     27.5 MiB      0.0 MiB           2       with open(lien, 'r') as f:
+   220     27.5 MiB      0.0 MiB           1           ligne = f.readline()
+   221     27.5 MiB      0.0 MiB           1           if ligne != '' :
+   222                                                     cree_fenetre(largeurFenetre, hauteurFenetre)
+   223                                                     if reprendre() == True :
+   224                                                         efface_tout()
+   225                                                         sauvegarde = True
+   226                                                         couleurJ1 = str(ligne)[:-1]
+   227                                                         couleurJ2 = str(f.readline()[:-1])
+   228                                                         lst_boule_J1 = eval(f.readline()[:-1])
+   229                                                         affiche_cercles(lst_boule_J1, couleurJ1)
+   230                                                         lst_boule_J2 = eval(f.readline()[:-1])
+   231                                                         affiche_cercles(lst_boule_J2, couleurJ2)
+   232                                                         tour = int(f.readline()[:-1])
+   233                                                         fin_partie = int(f.readline()[:-1])
+   234                                                         variantes = eval(f.readline()[:-1])
+   235                                                         PasseJ1 = str(f.readline()[:-1])
+   236                                                         if PasseJ1 == 'False' :
+   237                                                             PasseJ1 = False
+   238                                                         if PasseJ1 == 'True' :
+   239                                                             PasseJ1 = True
+   240                                                         ligne = f.readline()
+   241                                                         if ligne != '':
+   242                                                             liste_obstacle = eval(ligne)
+   243                                                             affiche_obstacles(liste_obstacle)
+   244                                                         ligne = f.readline()
+   245                                                         if ligne != '':
+   246                                                             banqueboulesJ1 = int(ligne)
+   247                                                             banqueboulesJ2 = int(f.readline()[:-1])
+   248
+   249     27.5 MiB      0.0 MiB           1       if sauvegarde == False :
+   250                                             #Menu jeu + Choix variantes
+   251    109.0 MiB     81.5 MiB           1           variantes, fin_partie = debut()
+   252
+   253                                             #Couleurs joueurs
+   254    109.0 MiB      0.0 MiB           1           couleurJ1 = choixcouleur(1920,1030,"Joueur1")
+   255    109.0 MiB      0.0 MiB           1           couleurJ2 = choixcouleur(1920,1030,"Joueur2")
+   256    109.0 MiB      0.0 MiB           1           while couleurJ2 == couleurJ1 :
+   257                                                     couleurJ2 = choixcouleur(1920,1030,"Joueur2")
+   258
+   259                                             # ================================================================================== CODE PRINCIPAL ========================================================================== #
+   260
+   261
+   262                                             # =================================== Création variables des variantes ============================ #
+   263
+   264    109.0 MiB      0.0 MiB           1           if variantes[5] == True :
+   265    109.0 MiB      0.0 MiB           1               listes_fichiers = []
+   266    109.0 MiB      0.0 MiB           1               dossier = path.join('.','saves_obstacles')
+   267    109.0 MiB      0.0 MiB           7               for i in (listdir(dossier)):
+   268    109.0 MiB      0.0 MiB           6                   listes_fichiers.append(i)
+   269
+   270    109.0 MiB      0.0 MiB           1               fichierob = choixobs(listes_fichiers)
+   271    109.0 MiB      0.0 MiB           1               if fichierob == 'ALEATOIRE' :
+   272                                                         liste_obstacle = creation_obstacles()
+   273                                                     else :
+   274    109.0 MiB      0.0 MiB           1                   lien = path.join('.','saves_obstacles',fichierob)
+   275    109.0 MiB      0.0 MiB           2                   with open(lien, 'r') as f:
+   276    109.0 MiB      0.0 MiB           1                       liste_obstacle = eval(f.read())
+   277    109.0 MiB      0.0 MiB           1                   affiche_obstacles(liste_obstacle)
+   278
+   279    109.0 MiB      0.0 MiB           1           if variantes[2] == True :
+   280                                                     banqueboulesvar4 = 50* fin_partie
+   281                                                     banqueboulesJ1 = banqueboulesvar4
+   282                                                     banqueboulesJ2 = banqueboulesvar4
+   283
+   284    109.0 MiB      0.0 MiB           1       terme = True
+   285    109.0 MiB      0.0 MiB           1       if sauvegarde == False :
+   286    109.0 MiB      0.0 MiB           1           PasseJ1 = False
+   287
+   288                                             # =================================================== Délimitation du terrain de jeu ============================================ #
+   289
+   290                                             #Zone de jeu
+   291    109.0 MiB      0.0 MiB           1       rectangle(0,0,1220,1029,'black')
+   292
+   293                                             #Zone des paramètres
+   294    109.0 MiB      0.0 MiB           1       rectangle(1221,0,1919,1029,'black','honeydew3')
+   295
+   296                                             #Paramètres
+   297    109.0 MiB      0.0 MiB           1       rectangle(1240,20,1900,150,'red','white',10,'boitedialogue')
+   298    109.0 MiB      0.0 MiB           1       rectangle(1360,900,1780,1000,'black','DeepSkyBlue3',tag='Quitter')
+   299    109.0 MiB      0.0 MiB           1       texte(1570,950,"QUITTER", "black", "center",police=policevar)
+   300
+   301                                             #Affichage paramètres
+   302    109.0 MiB      0.0 MiB           1       Mode = []
+   303    109.0 MiB      0.0 MiB           7       for i in range (len(variantes)):
+   304    109.0 MiB      0.0 MiB           6           if variantes[i] == True :
+   305    109.0 MiB      0.0 MiB           4               Mode.append('-couleur-reduit.png')
+   306                                                 else :
+   307    109.0 MiB      0.0 MiB           2               Mode.append('-gris-reduit.png')
+   308
+   309    109.0 MiB      0.0 MiB           1       image(1400, 250, path.join('.','icones','icone-sablier' + Mode[0]),'center')
+   310    109.0 MiB      0.0 MiB           1       image(1740, 250, path.join('.','icones','icone-choix-taille-boule' + Mode[2]),'center')
+   311    109.0 MiB      0.0 MiB           1       texte(1740, 350, 'BANQUE', "red", "center", policevar, 30)
+   312    109.0 MiB      0.0 MiB           1       image(1400, 635, path.join('.','icones','icone-score' + Mode[1]),'center')
+   313    109.0 MiB      0.0 MiB           1       image(1740, 635, path.join('.','icones','icone-terminaison' + Mode[4]),'center')
+   314    109.0 MiB      0.0 MiB           1       image(1400, 800, path.join('.','icones','icone-dynamique' + Mode[3]),'center')
+   315    109.0 MiB      0.0 MiB           1       image(1740, 800, path.join('.','icones','icone-obstacles' + Mode[5]),'center')
+   316
+   317                                             # =========================================================================================================================================================================== #
+   318                                             # ==                                                                                   JEU                                                                                 == #
+   319                                             # =========================================================================================================================================================================== #
+   320
+   321    109.0 MiB      0.0 MiB           1       rayon = 50
+   322
+   323    109.0 MiB      0.0 MiB           6       while victoire != True :
+   324    109.0 MiB      0.0 MiB          15           for joueur in range (2):
+   325
+   326    109.0 MiB      0.0 MiB          10               efface('numérotour')
+   327    109.0 MiB      0.0 MiB          10               num_tour = 'Tour : ' + str(tour + 1)
+   328    109.0 MiB      0.0 MiB          10               texte(1570,110,num_tour,ancrage='center', tag='numérotour',police=policevar)
+   329
+   330    109.0 MiB      0.0 MiB          10               if not(joueur%2) :
+   331    109.0 MiB      0.0 MiB           5                   plusthunes = False
+   332    109.0 MiB      0.0 MiB           5                   if PasseJ1 == False :
+   333    109.0 MiB      0.0 MiB           5                       efface('tour')
+   334    109.0 MiB      0.0 MiB           5                       rectangle(1240,20,1900,150,couleurJ1,epaisseur=10,tag='tour')
+   335    109.0 MiB      0.0 MiB           5                       texte(1570,60, "Au tour du J1", couleurJ1,'center',policevar, tag='tour')
+   336
+   337    109.0 MiB      0.0 MiB           5                       if variantes[2] == True :
+   338                                                                 if banqueboulesJ1 <= 9 :
+   339                                                                     faute(0,0,0,couleurJ1,'Tour passé pour J1')
+   340                                                                     plusthunes = True
+   341                                                                 else :
+   342                                                                     rayon,banqueboulesJ1 = choix_taille_boules(banqueboulesJ1,couleurJ1,couleurJ2, lst_boule_J1, lst_boule_J2, tour, fin_partie, variantes, liste_obstacle, banqueboulesJ1, banqueboulesJ2, PasseJ1=False)
+   343
+   344    109.0 MiB      0.0 MiB           5                       if plusthunes == False :
+   345    109.0 MiB      0.0 MiB           5                           if variantes[0] == True :
+   346    109.0 MiB      0.0 MiB           5                               affiche_fenetre_timer('Joueur 1',variantes,lst_boule_J1,lst_boule_J2,couleurJ1,couleurJ2)
+   347    109.0 MiB      0.0 MiB           5                               Ox, Oy, fintps = timer(5,variantes,lst_boule_J1,lst_boule_J2,couleurJ1,couleurJ2)
+   348    109.0 MiB      0.0 MiB           5                               if Ox == None :
+   349                                                                         faute(Ox, Oy, rayon, couleurJ1, 'FAUTE : Temps écoulé !')
+   350                                                                 else :
+   351                                                                     Ox, Oy, fin_partie, terme = clicOxOy(variantes,lst_boule_J1,lst_boule_J2,couleurJ1,couleurJ2,tour,fin_partie,terme)
+   352
+   353    109.0 MiB      0.0 MiB           5                       if Ox != None :
+   354                                                                 #Quitter
+   355    109.0 MiB      0.0 MiB           5                           if 1360 < Ox < 1780 and 900 < Oy < 1000 :
+   356                                                                     if variantes[5] == False :
+   357                                                                         liste_obstacle = []
+   358                                                                     if variantes[2] == False :
+   359                                                                         banqueboulesJ1 = None
+   360                                                                         banqueboulesJ2 = None
+   361                                                                     sauvegarder(couleurJ1,couleurJ2, lst_boule_J1, lst_boule_J2, tour, fin_partie, variantes, liste_obstacle, banqueboulesJ1, banqueboulesJ2, PasseJ1=False)
+   362
+   363    109.0 MiB      0.0 MiB           5                           pose_ronds (Ox, Oy, lst_boule_J1,lst_boule_J2, couleurJ1, couleurJ2, tour, rayon, variantes)
+   364
+   365                                                     else :
+   366    109.0 MiB      0.0 MiB           5                   plusthunes = False
+   367    109.0 MiB      0.0 MiB           5                   PasseJ1 = False
+   368    109.0 MiB      0.0 MiB           5                   efface('tour')
+   369    109.0 MiB      0.0 MiB           5                   rectangle(1240,20,1900,150,couleurJ2,epaisseur=10,tag='tour')
+   370    109.0 MiB      0.0 MiB           5                   texte(1570,60, "Au tour du J2", couleurJ2,'center', policevar, tag='tour')
+   371
+   372    109.0 MiB      0.0 MiB           5                   if variantes[2] == True :
+   373                                                             if banqueboulesJ2 <= 9 :
+   374                                                                 faute(0,0,0,couleurJ2,'Tour passé pour J2')
+   375                                                                 plusthunes = True
+   376                                                             else :
+   377                                                                 rayon,banqueboulesJ2 = choix_taille_boules(banqueboulesJ2,couleurJ1,couleurJ2, lst_boule_J1, lst_boule_J2, tour, fin_partie, variantes, liste_obstacle, banqueboulesJ1, banqueboulesJ2, PasseJ1=True)
+   378
+   379    109.0 MiB      0.0 MiB           5                   if plusthunes == False :
+   380    109.0 MiB      0.0 MiB           5                       if variantes[0] == True :
+   381    109.0 MiB      0.0 MiB           5                           affiche_fenetre_timer('Joueur 2',variantes,lst_boule_J1,lst_boule_J2,couleurJ2,couleurJ1)
+   382    109.0 MiB      0.0 MiB           5                           Ox, Oy, fintps = timer(5,variantes,lst_boule_J1,lst_boule_J2,couleurJ1,couleurJ2)
+   383    109.0 MiB      0.0 MiB           5                           if Ox == None :
+   384                                                                     faute(Ox, Oy, rayon, couleurJ2, 'FAUTE : Temps écoulé !')
+   385                                                             else :
+   386                                                                 Ox, Oy, fin_partie, terme = clicOxOy(variantes,lst_boule_J1,lst_boule_J2,couleurJ1,couleurJ2,tour,fin_partie,terme)
+   387
+   388    109.0 MiB      0.0 MiB           5                   if Ox != None :
+   389                                                             #Quitter
+   390    109.0 MiB      0.0 MiB           5                       if 1360 < Ox < 1780 and 900 < Oy < 1000 :
+   391                                                                 if variantes[5] == False :
+   392                                                                     liste_obstacle = []
+   393                                                                 if variantes[2] == False :
+   394                                                                     banqueboulesJ1 = None
+   395                                                                     banqueboulesJ2 = None
+   396                                                                 sauvegarder(couleurJ1,couleurJ2, lst_boule_J1, lst_boule_J2, tour, fin_partie, variantes, liste_obstacle, banqueboulesJ1, banqueboulesJ2,PasseJ1=True)
+   397
+   398    109.0 MiB      0.0 MiB           5                       pose_ronds(Ox, Oy, lst_boule_J2,lst_boule_J1, couleurJ2, couleurJ1, tour, rayon, variantes)
+   399
+   400    109.0 MiB      0.0 MiB           5           if variantes[3] == True :
+   401    109.0 MiB      0.0 MiB           5               if variantes[5] == False :
+   402                                                         liste_obstacle = []
+   403    109.0 MiB      0.0 MiB           5               dynamique(lst_boule_J1,lst_boule_J2,couleurJ1,couleurJ2,5,variantes[5],liste_obstacle)
+   404
+   405    109.0 MiB      0.0 MiB           5           if variantes[4] == True :
+   406                                                     variantes[4], fin_partie = terminaison(tour, fin_partie,couleurJ1)
+   407
+   408    109.0 MiB      0.0 MiB           5           tour += 1
+   409    109.0 MiB      0.0 MiB           5           if tour == fin_partie :
+   410    109.0 MiB      0.0 MiB           1               lien = path.join(".","save","save.txt")
+   411
+   412    109.0 MiB      0.0 MiB           2               with open(lien,'w') as fichier :
+   413    109.0 MiB      0.0 MiB           1                   fichier.truncate()
+   414    109.0 MiB      0.0 MiB           1               victoire = True
+   415    109.0 MiB      0.0 MiB           1               fin = True
+   416
+   417                                             # ============================================================================= AFFICHAGE DES SCORES ======================================================================= #
+   418
+   419    117.0 MiB      0.0 MiB           2       while fin==True :
+   420    115.2 MiB      6.3 MiB           1           ScoreFinJ1 = len(calcul_score(lst_boule_J1))
+   421    117.0 MiB      1.8 MiB           1           ScoreFinJ2 = len(calcul_score(lst_boule_J2))
+   422
+   423                                                 #Victoire J1
+   424    117.0 MiB      0.0 MiB           1           if ScoreFinJ1 > ScoreFinJ2 :
+   425                                                     rectangle(360,315,1560,715,couleurJ1,'white',epaisseur=5)
+   426                                                     texte(960,450,"VICTOIRE POUR JOUEUR 1",taille=60,ancrage='center',police=policevar)
+   427
+   428                                                 #Egalité
+   429    117.0 MiB      0.0 MiB           1           elif ScoreFinJ1 == ScoreFinJ2 :
+   430    117.0 MiB      0.0 MiB           1               rectangle(360,315,1560,715,'black','white',epaisseur=5)
+   431    117.0 MiB      0.0 MiB           1               texte(960,450,"EGALITE",taille=60,ancrage='center',police=policevar)
+   432
+   433                                                 #Victoire J2
+   434                                                 else :
+   435                                                     rectangle(360,315,1560,715,couleurJ2,'white',epaisseur=5)
+   436                                                     texte(960,450,"VICTOIRE POUR JOUEUR 2",taille=60,ancrage='center',police=policevar)
+   437
+   438    117.0 MiB      0.0 MiB           1           texte(960,600,"Score Joueur 1  :   "+str(ScoreFinJ1),taille=30,ancrage='center', couleur=couleurJ1,police=policevar)
+   439    117.0 MiB      0.0 MiB           1           texte(960,650,"Score Joueur 2  :   "+str(ScoreFinJ2),taille=30,ancrage='center', couleur=couleurJ2,police=policevar)
+   440    117.0 MiB      0.0 MiB           1           attente_clic()
+   441    117.0 MiB      0.0 MiB           1           fin = False
