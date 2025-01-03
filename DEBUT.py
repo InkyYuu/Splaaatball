@@ -5,7 +5,6 @@ from upemtk import *
 from CHOIXSAVE import *
 import multiprocessing
 
-
 def check_variant(key, item, x, y):
     Ox, Oy = item['x'], item['y']
     new_item = item.copy()  # Créer une copie pour éviter des conflits multiprocessing

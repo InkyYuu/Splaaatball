@@ -1,5 +1,6 @@
 # ==================================================================================== IMPORTS ========================================================================= #
 
+import cProfile
 from upemtk import *
 from math import sqrt
 from random import *
@@ -61,24 +62,6 @@ def reprendre () :
                 return False
                 
             mise_a_jour()
-
-def check_boule_conditions(boule, Ox, Oy, rayon):
-    """
-    Vérifie les conditions pour une boule ennemie donnée.
-    
-    Arguments :
-    boule : instance de Boule
-    Ox, Oy : coordonnées du point
-    rayon : rayon de la nouvelle boule
-
-    Retourne :
-    (intersecte, clique_dessus, indice)
-    """
-    if point_dans_boule(boule, Ox, Oy):
-        return (False, True, boule.tag)  # Clique dessus
-    elif point_dans_boule(boule, Ox, Oy, rayon):
-        return (True, False, boule.tag)  # Intersection
-    return (False, False, boule.tag)  # Rien
 
 def pose_ronds(Ox, Oy, liste_boule_allie, liste_boule_ennemi, couleur_allie, couleur_ennemi, tour, rayon, variantes):
     """

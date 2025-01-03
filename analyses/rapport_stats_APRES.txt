@@ -1,0 +1,95 @@
+Top 10 des fonctions les plus couteuses (temps cumule) :
+Fri Jan  3 19:03:38 2025    analyses/profiling_results.stats
+
+         2396762 function calls (2395639 primitive calls) in 16.540 seconds
+
+   Ordered by: cumulative time
+   List reduced from 670 to 20 due to restriction <20>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.002    0.002   16.540   16.540 SPLAAATBALL.py:185(main)
+   312087    9.502    0.000    9.579    0.000 {method 'call' of '_tkinter.tkapp' objects}
+   304797    0.069    0.000    9.365    0.000 upemtk.py:156(mise_a_jour)
+   304797    0.067    0.000    9.295    0.000 upemtk.py:72(update)
+   304798    0.067    0.000    9.295    0.000 __init__.py:1371(update)
+       24    0.000    0.000    6.313    0.263 pool.py:738(__exit__)
+       24    0.001    0.000    6.288    0.262 pool.py:654(terminate)
+        1    0.003    0.003    6.083    6.083 DEBUT.py:18(debut)
+       24    0.000    0.000    5.983    0.249 pool.py:305(_repopulate_pool)
+       24    0.003    0.000    5.983    0.249 pool.py:314(_repopulate_pool_static)
+      288    0.002    0.000    5.973    0.021 process.py:110(start)
+      288    0.003    0.000    5.963    0.021 context.py:334(_Popen)
+      288    0.008    0.000    5.958    0.021 popen_spawn_win32.py:45(__init__)
+      288    5.844    0.020    5.844    0.020 {built-in method _winapi.CreateProcess}
+       10    0.001    0.000    4.991    0.499 SPLAAATBALL.py:84(pose_ronds)
+       10    0.174    0.017    2.701    0.270 VARIANTES.py:199(clicOxOy)
+       10    0.000    0.000    2.611    0.261 VARIANTES.py:136(calcul_obstacles)
+        1    0.001    0.001    1.446    1.446 CHOIXOBS.py:12(choixobs)
+        2    0.002    0.001    1.143    0.572 COLORS.py:9(choixcouleur)
+     1088    0.003    0.000    0.329    0.000 upemtk.py:383(texte)
+
+
+
+Top 10 des fonctions les plus couteuses (temps total) :
+Fri Jan  3 19:03:38 2025    analyses/profiling_results.stats
+
+         2396762 function calls (2395639 primitive calls) in 16.540 seconds
+
+   Ordered by: internal time
+   List reduced from 670 to 20 due to restriction <20>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+   312087    9.502    0.000    9.579    0.000 {method 'call' of '_tkinter.tkapp' objects}
+      288    5.844    0.020    5.844    0.020 {built-in method _winapi.CreateProcess}
+       10    0.174    0.017    2.701    0.270 VARIANTES.py:199(clicOxOy)
+     3201    0.158    0.000    0.158    0.000 {built-in method _winapi.WaitForSingleObject}
+   304797    0.069    0.000    9.365    0.000 upemtk.py:156(mise_a_jour)
+   304798    0.067    0.000    9.295    0.000 __init__.py:1371(update)
+   304797    0.067    0.000    9.295    0.000 upemtk.py:72(update)
+   304786    0.065    0.000    0.094    0.000 upemtk.py:554(donne_evenement)
+        1    0.056    0.056    0.056    0.056 {built-in method _tkinter.create}
+310205/310153    0.029    0.000    0.029    0.000 {built-in method builtins.len}
+      288    0.028    0.000    0.028    0.000 {built-in method _winapi.TerminateProcess}
+    21812    0.027    0.000    0.027    0.000 {method 'getint' of '_tkinter.tkapp' objects}
+   304786    0.027    0.000    0.027    0.000 upemtk.py:568(type_evenement)
+     1189    0.027    0.000    0.056    0.000 {method 'dump' of '_pickle.Pickler' objects}
+     1395    0.019    0.000    0.070    0.000 __init__.py:1623(_substitute)
+       24    0.017    0.001    0.080    0.003 {method 'acquire' of '_multiprocessing.SemLock' objects}
+        2    0.013    0.006    0.013    0.006 VARIANTES.py:64(calcul_score)
+     2590    0.011    0.000    0.022    0.000 __init__.py:1544(_options)
+  313/174    0.010    0.000    0.001    0.000 {built-in method _winapi.WaitForMultipleObjects}
+        1    0.009    0.009    0.132    0.132 upemtk.py:466(attente_clic)
+
+
+
+Top 10 des fonctions les plus appelees :
+Fri Jan  3 19:03:38 2025    analyses/profiling_results.stats
+
+         2396762 function calls (2395639 primitive calls) in 16.540 seconds
+
+   Ordered by: call count
+   List reduced from 670 to 20 due to restriction <20>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+   312087    9.502    0.000    9.579    0.000 {method 'call' of '_tkinter.tkapp' objects}
+310205/310153    0.029    0.000    0.029    0.000 {built-in method builtins.len}
+   304798    0.067    0.000    9.295    0.000 __init__.py:1371(update)
+   304797    0.067    0.000    9.295    0.000 upemtk.py:72(update)
+   304797    0.069    0.000    9.365    0.000 upemtk.py:156(mise_a_jour)
+   304786    0.065    0.000    0.094    0.000 upemtk.py:554(donne_evenement)
+   304786    0.027    0.000    0.027    0.000 upemtk.py:568(type_evenement)
+    21812    0.027    0.000    0.027    0.000 {method 'getint' of '_tkinter.tkapp' objects}
+    20917    0.004    0.000    0.004    0.000 {built-in method builtins.isinstance}
+    15345    0.007    0.000    0.025    0.000 __init__.py:1629(getint_event)
+    11432    0.001    0.000    0.001    0.000 {built-in method builtins.callable}
+     8743    0.003    0.000    0.003    0.000 {built-in method builtins.getattr}
+     6657    0.004    0.000    0.004    0.000 {method 'update' of 'dict' objects}
+     5177    0.002    0.000    0.002    0.000 {built-in method _tkinter._flatten}
+     4218    0.001    0.000    0.001    0.000 {method 'append' of 'list' objects}
+     4206    0.001    0.000    0.001    0.000 process.py:99(_check_closed)
+     3290    0.001    0.000    0.001    0.000 {method 'items' of 'dict' objects}
+     3213    0.001    0.000    0.001    0.000 {built-in method nt.getpid}
+     3201    0.005    0.000    0.165    0.000 popen_spawn_win32.py:103(wait)
+     3201    0.158    0.000    0.158    0.000 {built-in method _winapi.WaitForSingleObject}
+
+

@@ -87,6 +87,24 @@ def calcul_score(tuple_boule) -> int :
 
     return len(pixels)
 
+def check_boule_conditions(boule, Ox, Oy, rayon):
+    """
+    Vérifie les conditions pour une boule ennemie donnée.
+    
+    Arguments :
+    boule : instance de Boule
+    Ox, Oy : coordonnées du point
+    rayon : rayon de la nouvelle boule
+
+    Retourne :
+    (intersecte, clique_dessus, indice)
+    """
+    if point_dans_boule(boule, Ox, Oy):
+        return (False, True, boule.tag)  # Clique dessus
+    elif point_dans_boule(boule, Ox, Oy, rayon):
+        return (True, False, boule.tag)  # Intersection
+    return (False, False, boule.tag)  # Rien
+
 def creation_obstacles() -> list:
     """
     Fonctionnement:
