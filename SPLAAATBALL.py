@@ -61,7 +61,6 @@ def reprendre () :
                 
             mise_a_jour()
 
-
 def pose_ronds (Ox, Oy, liste_boule_allie,liste_boule_ennemi, couleur_allie, couleur_ennemi, tour, rayon, variantes) :
     """
     Paramètres :
@@ -184,8 +183,8 @@ victoire = False
 tour = 0
 lst_boule_J1 = []
 lst_boule_J2 = []
-scoreJ1 = []
-scoreJ2 = []
+scoreJ1 = 0
+scoreJ2 = 0
 sauvegarde = False
 liste_obstacle = []
 policevar = 'Franklin Gothic Medium Cond'
@@ -203,8 +202,8 @@ def main():
     tour = 0
     lst_boule_J1 = []
     lst_boule_J2 = []
-    scoreJ1 = []
-    scoreJ2 = []
+    scoreJ1 = 0
+    scoreJ2 = 0
     sauvegarde = False
     liste_obstacle = []
     policevar = 'Franklin Gothic Medium Cond'
@@ -398,7 +397,7 @@ def main():
 
         if variantes[4] == True :
             variantes[4], fin_partie = terminaison(tour, fin_partie,couleurJ1)
-                
+        
         tour += 1
         if tour == fin_partie :
             lien = path.join(".","save","save.txt")
@@ -410,29 +409,27 @@ def main():
 
     # ============================================================================= AFFICHAGE DES SCORES ======================================================================= #
 
-    while fin==True :
-        ScoreFinJ1 = calcul_score(tuple(lst_boule_J1))
-        ScoreFinJ2 = calcul_score(tuple(lst_boule_J2))
+    if fin:
+        scoreJ1 = calcul_score(tuple(lst_boule_J1))
+        scoreJ2 = calcul_score(tuple(lst_boule_J2))
+        
+        # Détermination du résultat
+        if scoreJ1 > scoreJ2:
+            couleur, texte_victoire = couleurJ1, "VICTOIRE POUR JOUEUR 1"
+        elif scoreJ1 < scoreJ2:
+            couleur, texte_victoire = couleurJ2, "VICTOIRE POUR JOUEUR 2"
+        else:
+            couleur, texte_victoire = "black", "ÉGALITÉ"
 
-        #Victoire J1
-        if ScoreFinJ1 > ScoreFinJ2 :
-            rectangle(360,315,1560,715,couleurJ1,'white',epaisseur=5)
-            texte(960,450,"VICTOIRE POUR JOUEUR 1",taille=60,ancrage='center',police=policevar)
+        # Affichage des résultats
+        rectangle(360, 315, 1560, 715, couleur, "white", epaisseur=5)
+        texte(960, 450, texte_victoire, taille=60, ancrage="center", police=policevar)
 
-        #Egalité
-        elif ScoreFinJ1 == ScoreFinJ2 :
-            rectangle(360,315,1560,715,'black','white',epaisseur=5)
-            texte(960,450,"EGALITE",taille=60,ancrage='center',police=policevar)
+        # Affichage des scores
+        texte(960, 600, f"Score Joueur 1 : {scoreJ1}", taille=30, ancrage="center", couleur=couleurJ1, police=policevar)
+        texte(960, 650, f"Score Joueur 2 : {scoreJ2}", taille=30, ancrage="center", couleur=couleurJ2, police=policevar)
 
-        #Victoire J2
-        else :
-            rectangle(360,315,1560,715,couleurJ2,'white',epaisseur=5)
-            texte(960,450,"VICTOIRE POUR JOUEUR 2",taille=60,ancrage='center',police=policevar)
-
-        texte(960,600,"Score Joueur 1  :   "+str(ScoreFinJ1),taille=30,ancrage='center', couleur=couleurJ1,police=policevar)
-        texte(960,650,"Score Joueur 2  :   "+str(ScoreFinJ2),taille=30,ancrage='center', couleur=couleurJ2,police=policevar)
         attente_clic()
-        fin = False
 
 
 if __name__ == "__main__":

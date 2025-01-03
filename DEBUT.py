@@ -3,6 +3,17 @@ from math import *
 from random import *
 from upemtk import *
 from CHOIXSAVE import *
+import multiprocessing
+
+
+def check_variant(key, item, x, y):
+    Ox, Oy = item['x'], item['y']
+    new_item = item.copy()  # Créer une copie pour éviter des conflits multiprocessing
+    if Ox < x < (Ox + 320) and Oy < y < (Oy + 275):
+        # On alterne l'état
+        new_item["actif"] = not new_item["actif"]
+    return key, new_item
+    
 
 def debut():
     hauteurFenetre = 1080
@@ -10,7 +21,7 @@ def debut():
     menu = True
 
     # COULEURS
-    couleurboutonsGauche = 'SkyBlue2'
+    # couleurboutonsGauche = 'SkyBlue2'
     couleurboutonsVar = 'snow'
     policevar = 'Franklin Gothic Medium Cond'
     lstcolo=['red','blue','green','cyan','pink','purple','yellow','orange']
@@ -156,11 +167,14 @@ def debut():
                         a = 0
                     
                     #=================================================VARIANTS===========================================================
-                    for key, item in variants.items():
-                        Ox, Oy = item['x'], item['y']  
-                        if Ox < x < (Ox + 320) and Oy < y < (Oy + 275):
-                            # Alterner l'état de "actif"
-                            item["actif"] = not item["actif"]
+                            
+                    with multiprocessing.Pool() as pool:
+                        results = pool.starmap(func=check_variant, iterable=[(key, item, x, y) for key, item in variants.items()])
+                    # Mettre à jour les valeurs modifiées
+                    if results :
+                        for key, item in results:
+                            variants[key] = item
+
 
                     #=================================================BOUTONS PRINCIPAUX==============================================
                     #COORDONNEE DU BOUTON JOUER
