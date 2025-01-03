@@ -54,7 +54,7 @@ def reprendre () :
 
             if type_ev == "ClicGauche":
                 ferme_fenetre()
-                lien = path.join(".","save","save.txt")
+                lien = path.join(".","save","save.json")
                 with open(lien,'w') as fichier :
                     fichier.truncate()
                 return False
@@ -208,37 +208,43 @@ def main():
     liste_obstacle = []
     policevar = 'Franklin Gothic Medium Cond'
 
-    lien = path.join('.','save','save.txt')
-    with open(lien, 'r') as f:
-        ligne = f.readline()
-        if ligne != '' :
-            cree_fenetre(largeurFenetre, hauteurFenetre)
-            if reprendre() == True :
-                efface_tout()
-                sauvegarde = True
-                couleurJ1 = str(ligne)[:-1]
-                couleurJ2 = str(f.readline()[:-1])
-                lst_boule_J1 = eval(f.readline()[:-1])
-                affiche_cercles(lst_boule_J1, couleurJ1)
-                lst_boule_J2 = eval(f.readline()[:-1])
-                affiche_cercles(lst_boule_J2, couleurJ2)
-                tour = int(f.readline()[:-1])
-                fin_partie = int(f.readline()[:-1])
-                variantes = eval(f.readline()[:-1])
-                PasseJ1 = str(f.readline()[:-1])
-                if PasseJ1 == 'False' :
-                    PasseJ1 = False
-                if PasseJ1 == 'True' :
-                    PasseJ1 = True
-                ligne = f.readline()
-                if ligne != '':
-                    liste_obstacle = eval(ligne)
-                    affiche_obstacles(liste_obstacle)
-                ligne = f.readline()
-                if ligne != '':
-                    banqueboulesJ1 = int(ligne)
-                    banqueboulesJ2 = int(f.readline()[:-1])
+    lien = path.join('.', 'save', 'save.json')
+    if path.exists(lien):
+        with open(lien, 'r') as f:
+            try:
+                data = json.load(f)
+                if data:
+                    cree_fenetre(largeurFenetre, hauteurFenetre)
+                    if reprendre() == True:
+                        efface_tout()  # Efface tout pour redémarrer la partie
 
+                        # Initialisation des variables à partir du fichier JSON
+                        sauvegarde = True
+                        couleurJ1 = data.get("couleurJ1", "")
+                        couleurJ2 = data.get("couleurJ2", "")
+                        lst_boule_J1 = [Boule(int(b['x']), int(b['y']), int(b['rayon']), b['tag']) for b in data.get("lstJ1", [])]
+                        lst_boule_J2 = [Boule(int(b['x']), int(b['y']), int(b['rayon']), b['tag']) for b in data.get("lstJ2", [])]
+                        tour = data.get("tour")
+                        fin_partie = data.get("fin_partie")
+                        variantes = data.get("variantes")
+                        PasseJ1 = data.get("PasseJ1")
+                        
+                        affiche_cercles(lst_boule_J1, couleurJ1)
+                        affiche_cercles(lst_boule_J2, couleurJ2)
+
+                        for obs in data.get("lstObs"):
+                            if obs["type"] == "boule":
+                                liste_obstacle.append(Boule(obs["x"], obs["y"], obs["rayon"], obs["tag"]))
+                            elif obs["type"] == "carre":
+                                liste_obstacle.append(Carre(obs["x"], obs["y"], obs["cote"], obs["tag"]))
+                        if liste_obstacle:
+                            affiche_obstacles(liste_obstacle)
+
+                        banqueboulesJ1 = data.get("banqueJ1", None)
+                        banqueboulesJ2 = data.get("banqueJ2", None)
+            except json.JSONDecodeError:
+                pass
+                    
     if sauvegarde == False :
     #Menu jeu + Choix variantes
         variantes, fin_partie = debut()
@@ -266,7 +272,13 @@ def main():
             else :
                 lien = path.join('.','saves_obstacles',fichierob)
                 with open(lien, 'r') as f:
-                    liste_obstacle = eval(f.read())
+                        data = json.load(f)
+                liste_obstacle = []
+                for obs in data["obstacles"]:
+                    if obs["type"] == "boule":
+                        liste_obstacle.append(Boule(obs["x"], obs["y"], obs["rayon"], obs["tag"]))
+                    elif obs["type"] == "carre":
+                        liste_obstacle.append(Carre(obs["x"], obs["y"], obs["cote"], obs["tag"]))
                 affiche_obstacles(liste_obstacle)
 
         if variantes[2] == True :
@@ -400,7 +412,7 @@ def main():
         
         tour += 1
         if tour == fin_partie :
-            lien = path.join(".","save","save.txt")
+            lien = path.join(".","save","save.json")
 
             with open(lien,'w') as fichier :
                 fichier.truncate()

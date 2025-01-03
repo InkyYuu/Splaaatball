@@ -1,5 +1,6 @@
 # ==================================================================================== IMPORTS ========================================================================= #
 
+import json
 from upemtk import *
 from math import *
 from os import path
@@ -324,11 +325,12 @@ def SPLAATOMAKER(independance):
 
     efface_tout()
     nom = clavier()
-    nom = str(nom)+".txt"
+    nom = str(nom)+".json"
     lien = path.join(".","saves_obstacles",nom)
-
-    with open(lien,'x') as fichier :
-        fichier.write(str(lstobs))
+    obstacles_data = [obs.to_dict() for obs in lstobs]
+    
+    with open(lien, 'w') as fichier:
+            json.dump({"obstacles": obstacles_data}, fichier, indent=4)
 
     if independance == False :
         return nom

@@ -13,3 +13,12 @@ class Carre:
         self.y2 = y + cote
         self.cote = cote
         self.tag = tag
+        
+    def to_dict(self):
+        return {
+            "type": "carre",
+            "x": self.x,
+            "y": self.y,
+            "cote": self.cote,
+            "tag": self.tag
+        }

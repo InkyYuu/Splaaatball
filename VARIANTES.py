@@ -1,5 +1,6 @@
 # ==================================================================================== IMPORTS ========================================================================= #
 
+import json
 from upemtk import *
 from random import *
 from math import *
@@ -14,46 +15,50 @@ from CARRE import Carre
 policevar = 'Franklin Gothic Medium Cond'
 # ==================================================================================== FONCTIONS ====================================================================== #
 
-def sauvegarder (couleurJ1, couleurJ2, lstJ1, lstJ2, tour, fin_partie, variantes, lstObs, banqueJ1, banqueJ2, PasseJ1) :
+def sauvegarder(couleurJ1, couleurJ2, lstJ1, lstJ2, tour, fin_partie, variantes, lstObs, banqueJ1, banqueJ2, PasseJ1):
+    rectangle(600, 125, 1320, 250, 'black', 'white', 8, 'info_terminaison')
+    texte(950, 170, 'Voulez-vous sauvegarder la partie en cours ?', 'black', 'center', 'Franklin Gothic Medium Cond', 14, 'info_terminaison')
+    texte(950, 210, 'Appuyez sur "s" pour sauvegarder ou cliquez pour quitter', 'black', 'center', 'Franklin Gothic Medium Cond', 14, 'info_terminaison')
+    
+    while True:
+        mise_a_jour()
+        evenement = donne_evenement()
+        type_ev = type_evenement(evenement)  # type = clic
 
-    rectangle(600,125,1320,250,'black','white',8,'info_terminaison')
-    texte(950,170,'Voulez vous sauvegarder la partie en cours ?','black','center','Franklin Gothic Medium Cond', 14,'info_terminaison')
-    texte(950,210,'Appuyer sur s pour sauvegarder ou cliquer pour quitter','black','center','Franklin Gothic Medium Cond', 14,'info_terminaison')
-
-    while True :
-            mise_a_jour()
-            evenement = donne_evenement()
-            type_ev = type_evenement(evenement) #type =  clic
-
-            if type_ev == 'Touche': 
-                nom_touche = touche(evenement)
-                if nom_touche == 's':
-                        lien = path.join(".","save","save.txt")
-
-                        with open(lien,'w') as fichier :
-                            fichier.write(str(couleurJ1)+'\n')
-                            fichier.write(str(couleurJ2)+'\n')
-                            fichier.write(str(lstJ1)+'\n')
-                            fichier.write(str(lstJ2)+'\n')
-                            fichier.write(str(tour)+'\n')
-                            fichier.write(str(fin_partie)+'\n')
-                            fichier.write(str(variantes)+'\n')
-                            fichier.write(str(PasseJ1)+'\n')
-                            if lstObs != [] :
-                                fichier.write(str(lstObs)+'\n')
-                            if banqueJ1 != None :
-                                fichier.write(str(banqueJ1)+'\n')
-                                fichier.write(str(banqueJ2)+'\n')
-                        
-                            ferme_fenetre()
-                            quit()
-
-            if type_ev == "ClicGauche":
-                lien = path.join(".","save","save.txt")
-                with open(lien,'w') as fichier :
-                    fichier.truncate()
+        if type_ev == 'Touche':
+            nom_touche = touche(evenement)
+            if nom_touche == 's':
+                lien = path.join(".", "save", "save.json")
+                data = {
+                    "couleurJ1": couleurJ1,
+                    "couleurJ2": couleurJ2,
+                    "lstJ1": [{"tag": b.tag, "x": b.x, "y": b.y, "rayon": b.rayon} for b in lstJ1],
+                    "lstJ2": [{"tag": b.tag, "x": b.x, "y": b.y, "rayon": b.rayon} for b in lstJ2],
+                    "tour": tour,
+                    "fin_partie": fin_partie,
+                    "variantes": variantes,
+                    "lstObs": [{"type": "boule" if isinstance(obs, Boule) else "carre",
+                                "tag": obs.tag, "x": obs.x, "y": obs.y, "rayon": getattr(obs, 'rayon', None), "cote": getattr(obs, 'cote', None)}
+                                for obs in lstObs],
+                    "banqueJ1": banqueJ1,
+                    "banqueJ2": banqueJ2,
+                    "PasseJ1": PasseJ1
+                }
+                
+                with open(lien, 'w') as fichier:
+                    json.dump(data, fichier, indent=4)
+                
                 ferme_fenetre()
                 quit()
+        
+        if type_ev == "ClicGauche":
+            lien = path.join(".", "save", "save.json")
+            with open(lien, 'w') as fichier:
+                json.dump({}, fichier)
+            
+            ferme_fenetre()
+            quit()
+
 
 @lru_cache
 def calcul_score(tuple_boule) -> int :
@@ -102,6 +107,7 @@ def creation_obstacles() -> list:
 
 def affiche_cercles(lst, couleur) :
     for o in lst :
+        print(o)
         cercle(o.x,o.y,o.rayon,remplissage=couleur,tag=o.tag)
 
 def affiche_obstacles(lst) :

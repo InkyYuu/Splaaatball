@@ -34,6 +34,15 @@ class Boule:
         else :
             raise ValueError("Le rayon doit être positif")
         
+    def to_dict(self):
+        return {
+            "type": "boule",
+            "x": self.x,
+            "y": self.y,
+            "rayon": self.rayon,
+            "tag": self.tag
+        }
+        
 @lru_cache
 def distance(Boule1: Boule, Ox:int, Oy:int):
     return (Boule1.x - Ox)**2 + (Boule1.y - Oy)**2

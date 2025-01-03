@@ -7,12 +7,10 @@ from upemtk import *
 
 hauteurFenetre = 1030
 largeurFenetre = 1920
-
-
     
 
 def choixobs(lst):
-#CEST LE TEXTE D'INFORMATION
+    #CEST LE TEXTE D'INFORMATION
     rectangle(0,0,1920,1030,'white','honeydew3')
     texte((largeurFenetre/2),60,"Choisissez votre fichier prédéfinis d\'obstacles : ",taille=60,ancrage='center')
 
