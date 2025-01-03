@@ -1,14 +1,15 @@
 # ==================================================================================== IMPORTS ========================================================================= #
 
 from upemtk import *
-from math import sqrt, acos, pi
+from math import sqrt
 from random import *
 from time import *
 from os import listdir
+from multiprocessing import Pool
 
 # =============================================================================== NOS MODULES A NOUS ================================================================== #
 
-from BOULE import Boule, distance, point_dans_boule
+from BOULE import Boule, point_dans_boule
 from COLORS import *
 from DEBUT import *
 from VARIANTES import *
@@ -61,115 +62,106 @@ def reprendre () :
                 
             mise_a_jour()
 
-def pose_ronds (Ox, Oy, liste_boule_allie,liste_boule_ennemi, couleur_allie, couleur_ennemi, tour, rayon, variantes) :
+def check_boule_conditions(boule, Ox, Oy, rayon):
     """
-    Paramètres :
-    Ox : Type int - abscisse du point
-    Oy : Type int - ordonnée du point
-    liste_boule_allie : Type list - Contient les données des boules du joueur qui pose sa boule - Sous forme [X(int/float), Y(int/float), R(int/float), Tag(str)]
-    liste_boule_ennemi : Type list - Contient les données des boules du joueur ennemi (qui ne pose pas sa boule) - Sous forme [X(int/float), Y(int/float), R(int/float), Tag(str)]
-    couleur_allie : Type string - Couleur du joueur qui pose sa boule
-    couleur_ennemi : Type string - Couleur du joueur ennemi (qui ne pose pas sa boule)
-    tour : Type integer - Numéro du tour actuel
-    rayon : Type integer ou float - Rayon de la boule qui va être posé
-    variantes : Type list - Contient les informmations si les variables sont activées ou non (obstacles soit variante[5] contient une liste d'obstacle si le mode est activé)
+    Vérifie les conditions pour une boule ennemie donnée.
+    
+    Arguments :
+    boule : instance de Boule
+    Ox, Oy : coordonnées du point
+    rayon : rayon de la nouvelle boule
 
-    Fonctionnement :
-    La fonction attend le clic de l'utilisateur puis va vérifier si la boule est posable en fonction des règles déterminées
-    Les variantes viennent rajouter des appels de fonctions dans d'autres modules
-
-    Les différents cas étudiés :
-    La bordure est dépassée - La boule est intersecter par une autre (allié ou ennemie) - Clique dans une boule existante (allié ou ennemie) - La boule est la première posée - Variantes
+    Retourne :
+    (intersecte, clique_dessus, indice)
     """
+    if point_dans_boule(boule, Ox, Oy):
+        return (False, True, boule.tag)  # Clique dessus
+    elif point_dans_boule(boule, Ox, Oy, rayon):
+        return (True, False, boule.tag)  # Intersection
+    return (False, False, boule.tag)  # Rien
 
-    #Différencation des cas
-    Cas1 = False 
+def pose_ronds(Ox, Oy, liste_boule_allie, liste_boule_ennemi, couleur_allie, couleur_ennemi, tour, rayon, variantes):
+    """
+    Voir documentation d'origine pour la description des paramètres.
+    """
+    # Différenciation des cas
+    Cas1 = False
     Cas2 = False
     Cas3 = False
+    indice = None
 
     # ============================================================= Premières vérifications ========================================================== #
-    
-    #Bordure de l'écran
-    if Oy - rayon < 0 or Oy + rayon > 1029 or Ox - rayon < 0  or Ox + rayon > 1220 :
+
+    # Bordure de l'écran
+    if Oy - rayon < 0 or Oy + rayon > 1029 or Ox - rayon < 0 or Ox + rayon > 1220:
         faute(Ox, Oy, rayon, couleur_allie, "FAUTE : Zone de jeu")
         return
 
-    #Obstacles
-    if variantes[5] != False : 
-        divise = False
-        for i in range(len(liste_boule_ennemi)):
-            divise = point_dans_boule(liste_boule_ennemi[i], Ox, Oy)
-        if calcul_obstacles(Ox,Oy,rayon,liste_obstacle) == False and divise == False:
-            faute(Ox,Oy,rayon,couleur_allie,'FAUTE : Obstacle')
+    # Obstacles
+    if variantes[5] != False:
+        divise = any(point_dans_boule(boule, Ox, Oy) for boule in liste_boule_ennemi)
+        if not calcul_obstacles(Ox,Oy,rayon,liste_obstacle) and not divise:
+            faute(Ox, Oy, rayon, couleur_allie, 'FAUTE : Obstacle')
             return
 
-    #Premier rond : Ajout sans passée par le reste des cas
-    if liste_boule_allie == [] and liste_boule_ennemi == []:
-        cercle(Ox,Oy,rayon,'black',couleur_allie,tag='boule'+couleur_allie+str(tour))
-        liste_boule_allie.append(Boule(Ox,Oy,rayon,'boule'+couleur_allie+str(tour)))
+    # Premier rond : Ajout sans passer par le reste des cas
+    if not liste_boule_allie and not liste_boule_ennemi:
+        cercle(Ox, Oy, rayon, 'black', couleur_allie, tag='boule' + couleur_allie + str(tour))
+        liste_boule_allie.append(Boule(Ox, Oy, rayon, 'boule' + couleur_allie + str(tour)))
+        return
 
     # ============================================================= Autres vérifications ========================================================== #
-    
-    else :
 
-        # ============================================ Conditions ennemis : Rien / Intersection / Clique dessus =========================================== #
-        
-        for i in range(len(liste_boule_ennemi)):
+    # Vérifications parallélisées pour les boules ennemies
+    with Pool() as pool:
+        results = pool.starmap(check_boule_conditions, [(boule, Ox, Oy, rayon) for boule in liste_boule_ennemi])
 
-            # ============================= Vérification si joueur appuie dans la couleur ennemie : division boule en 2 =============================== #
-            if point_dans_boule(liste_boule_ennemi[i], Ox, Oy) :
-                Cas3 = True
-                indice = i
-                break
+    for intersecte, clique_dessus, tag in results:
+        if clique_dessus:
+            Cas3 = True
+            indice = next((i for i, boule in enumerate(liste_boule_ennemi) if boule.tag == tag), None)
+            break
+        elif intersecte:
+            Cas2 = True
 
-            # ================================== Vérification si joueur intersec la couleur ennemie : interdit ======================================== #
-            elif point_dans_boule(liste_boule_ennemi[i], Ox, Oy, rayon):
-                Cas2 = True
+    if not Cas2 and not Cas3:
+        Cas1 = True
 
-        # ================================================================= Rien de particulier ========================================================= #
-        if Cas2 == False and Cas3 == False :
-            Cas1 = True
+    # ==================================================== Affichage / Calcul / Manipulations des cas =============================================== #
 
-        # ==================================================== Affichage / Calcul / Manipulations des cas =============================================== #
+    # Cas 1
+    if Cas1:
+        cercle(Ox, Oy, rayon, 'black', couleur_allie, tag='boule' + couleur_allie + str(tour))
+        liste_boule_allie.append(Boule(Ox, Oy, rayon, 'boule' + couleur_allie + str(tour)))
 
-        #Cas 1
-        if Cas1 == True :
-            cercle(Ox,Oy,rayon,'black',couleur_allie,tag='boule'+couleur_allie+str(tour))
-            liste_boule_allie.append(Boule(Ox,Oy,rayon,'boule'+couleur_allie+str(tour)))
+    # Cas 2
+    elif Cas2:
+        faute(Ox, Oy, rayon, couleur_allie, 'FAUTE : Intersection')
 
-        #Cas 2
-        elif Cas2 == True and Cas3 == False:
-            faute(Ox,Oy,rayon,couleur_allie,'FAUTE : Intersection')
+    # Cas 3
+    elif Cas3:
+        boule_ennemie = liste_boule_ennemi[indice]
+        vecteurU = [(Ox - boule_ennemie.x), (Oy - boule_ennemie.y)]
+        normeU = sqrt((vecteurU[0] ** 2) + vecteurU[1] ** 2)
 
-        #Cas 3
-        elif Cas3 == True :
+        rayon_bouleclic = boule_ennemie.rayon - normeU
+        rayon_boulerestante = normeU
 
-            #Calcul du vecteur
-            vecteurU = [(Ox-liste_boule_ennemi[indice].x),(Oy-liste_boule_ennemi[indice].y)]
-            normeU = sqrt((vecteurU[0]**2)+vecteurU[1]**2)
+        if rayon_boulerestante == 0:
+            return
 
-            #Calcul du nouveau rayon
-            rayon_bouleclic = liste_boule_ennemi[indice].rayon- normeU
-            rayon_boulerestante = normeU
+        NewOx = boule_ennemie.x - ((rayon_bouleclic / rayon_boulerestante) * (Ox - boule_ennemie.x))
+        NewOy = boule_ennemie.y - ((rayon_bouleclic / rayon_boulerestante) * (Oy - boule_ennemie.y))
 
-            #Calcul des coordonnées de la nouvelle boule non choisie
-            if rayon_boulerestante == 0 :
-                return
-            NewOx = (liste_boule_ennemi[indice].x)-((rayon_bouleclic/rayon_boulerestante)*(Ox-liste_boule_ennemi[indice].x))
-            NewOy = (liste_boule_ennemi[indice].y)-((rayon_bouleclic/rayon_boulerestante)*(Oy-liste_boule_ennemi[indice].y))
+        cercle(Ox, Oy, rayon_bouleclic, 'black', couleur_ennemi, tag='boule' + couleur_ennemi + str(tour) + 'A')
+        cercle(NewOx, NewOy, rayon_boulerestante, 'black', couleur_ennemi, tag='boule' + couleur_ennemi + str(tour) + 'B')
 
-            #Nouvelles sous-boules
-            cercle(Ox,Oy,rayon_bouleclic,'black',couleur_ennemi,tag='boule'+couleur_ennemi+str(tour)+'A')
-            cercle(NewOx,NewOy,rayon_boulerestante,'black',couleur_ennemi,tag='boule'+couleur_ennemi+str(tour)+'B')
-            
-            #Ajout des informations à la liste
-            liste_boule_ennemi.append(Boule(Ox,Oy,rayon_bouleclic,'boule'+couleur_ennemi+str(tour)+'A'))
-            liste_boule_ennemi.append(Boule(NewOx,NewOy,rayon_boulerestante,'boule'+couleur_ennemi+str(tour)+'B'))
+        liste_boule_ennemi.append(Boule(Ox, Oy, rayon_bouleclic, 'boule' + couleur_ennemi + str(tour) + 'A'))
+        liste_boule_ennemi.append(Boule(NewOx, NewOy, rayon_boulerestante, 'boule' + couleur_ennemi + str(tour) + 'B'))
 
-            #Suppression ancienne boule et ancien score (soustraction)
-            efface(liste_boule_ennemi[indice].tag)
-            liste_boule_ennemi.pop(indice)
-            
+        efface(boule_ennemie.tag)
+        liste_boule_ennemi.pop(indice)
+
     mise_a_jour()
 
 # ============================================================================== VARIABLES ================================================================================== #

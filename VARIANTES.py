@@ -7,6 +7,7 @@ from math import *
 from time import *
 from os import path
 from functools import lru_cache
+from multiprocessing import Pool
 
 from BOULE import Boule, distance, point_dans_boule
 from CARRE import Carre
@@ -118,7 +119,21 @@ def affiche_obstacles(lst) :
             rectangle(o.x,o.y,o.x2,o.y2,tag=o.tag,remplissage='black')
 
 
-def calcul_obstacles(Ox,Oy,rayon,liste_obstacle) -> bool:
+def obstacle_verification(obstacle, Ox, Oy, rayon):
+    """
+    Vérifie si la boule touche un obstacle (Boule ou Carré).
+    """
+    if isinstance(obstacle, Boule):
+        return not point_dans_boule(obstacle, Ox, Oy, rayon)
+    elif isinstance(obstacle, Carre):
+        for x in range(int(Ox - rayon), int(Ox + rayon) + 1):
+            for y in range(int(Oy - rayon), int(Oy + rayon) + 1):
+                if sqrt((x - Ox) ** 2 + (y - Oy) ** 2) <= rayon:
+                    if obstacle.x < x < obstacle.x2 and obstacle.y < y < obstacle.y2:
+                        return False
+    return True
+
+def calcul_obstacles(Ox, Oy, rayon, liste_obstacle) -> bool:
     """
     Paramètres :
     Ox : type int or float - X de la boule que le joueur veut poser
@@ -133,17 +148,9 @@ def calcul_obstacles(Ox,Oy,rayon,liste_obstacle) -> bool:
     False si la boule touche
     True si la boule ne touche pas
     """
-    for h in range(len(liste_obstacle)):
-            if isinstance(liste_obstacle[h], Boule)  :
-                if point_dans_boule(liste_obstacle[h], Ox, Oy, rayon):
-                    return False
-            elif isinstance(liste_obstacle[h], Carre) :
-                for x in range (int(Ox-rayon),int(Ox+rayon)+1):
-                    for y in range(int(Oy-rayon),int(Oy+rayon)+1):
-                        if sqrt((x-Ox)**2 + (y-Oy)**2) <= rayon :
-                            if liste_obstacle[h].x < x < liste_obstacle[h].x2 and liste_obstacle[h].y < y < liste_obstacle[h].y2 :
-                                return False
-    return True
+    with Pool() as pool:
+        results = pool.starmap(obstacle_verification, [(obstacle, Ox, Oy, rayon) for obstacle in liste_obstacle])
+    return all(results)
 
 def affiche_fenetre_timer (joueur,variantes,lst_bouleJ1,lst_bouleJ2,couleurJ1,couleurJ2):
         """
@@ -468,16 +475,25 @@ def choix_taille_boules(banqueboules,couleurJ1,couleurJ2, lst_boule_J1, lst_boul
     efface('alerte')
     return rayon,banqueboules
 
-def detection_ennemi(liste_boule_ennemi,Ox,Oy,expension):
-    proche = None
-    for boule in liste_boule_ennemi :
-        distance = sqrt((boule.x-Ox)**2 + (boule.y-Oy)**2)
-        if distance < boule.rayon + expension :
-            if proche == None :
-                proche = (distance, boule)
-            elif proche[0] > distance :
-                proche = (distance,boule)
-    return proche
+def ennemi_distance(boule, Ox, Oy, expansion):
+    """
+    Calcule la distance entre la boule et la position donnée.
+    """
+    if point_dans_boule(boule, Ox, Oy, expansion):
+        return (distance(boule, Ox, Oy), boule)
+    return None
+
+def detection_ennemi(liste_boule_ennemi, Ox, Oy, expansion):
+    """
+    Trouve l'ennemi le plus proche qui est dans le rayon d'expansion.
+    """
+    with Pool() as pool:
+        results = pool.starmap(ennemi_distance, [(boule, Ox, Oy, expansion) for boule in liste_boule_ennemi])
+    
+    proches = [res for res in results if res is not None]
+    if proches:
+        return min(proches, key=lambda x: x[0])
+    return None
 
 
 def dynamique (lst_boule_J1,lst_boule_J2,couleurJ1,couleurJ2,expension,obstacles,liste_obstacle):
