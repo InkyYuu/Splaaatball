@@ -7,7 +7,9 @@ from time import *
 from os import path
 from functools import lru_cache
 
-from BOULE import Boule
+from BOULE import Boule, distance, point_dans_boule
+from CARRE import Carre
+
 # ==================================================================================== VARIABLES ====================================================================== #
 policevar = 'Franklin Gothic Medium Cond'
 # ==================================================================================== FONCTIONS ====================================================================== #
@@ -53,16 +55,8 @@ def sauvegarder (couleurJ1, couleurJ2, lstJ1, lstJ2, tour, fin_partie, variantes
                 ferme_fenetre()
                 quit()
 
-def calcul_score_new(tuple_boule) -> int :
-    score = 0
-    for boule in tuple_boule :
-        for x in range (int(boule.x - boule.rayon),int(boule.x + boule.rayon)+1):
-            for y in range (int(boule.y - boule.rayon),int(boule.y + boule.rayon)+1):
-                if distance(boule, x, y) < boule.rayon :
-                    score += 1
-    return score
-
-def calcul_score (liste_boule) -> int:
+@lru_cache
+def calcul_score(tuple_boule) -> int :
     """
     Paramètre :
     liste_boule : Type list - Contient les données des boules du joueur qui pose sa boule - Sous forme [X(int/float), Y(int/float), R(int/float), Tag(str)]
@@ -70,12 +64,12 @@ def calcul_score (liste_boule) -> int:
     Fonctionnement :
     La fonction vérifie si le pixel appartient aux ronds du joueurs et renvoie le score total cumulé
     """
-    score = set()
-    for boule in liste_boule :
-        for x in range (int(boule[0]-boule[2]),int(boule[0]+boule[2])+1):
-            for y in range (int(boule[1]-boule[2]),int(boule[1]+boule[2])+1):
-                if sqrt((boule[0]-x)**2 + (boule[1]-y)**2) < boule[2] :
-                    score.add((x,y))
+    score = 0
+    for boule in tuple_boule :
+        for x in range (int(boule.x - boule.rayon),int(boule.x + boule.rayon)+1):
+            for y in range (int(boule.y - boule.rayon),int(boule.y + boule.rayon)+1):
+                if point_dans_boule(boule, x, y) :
+                    score += 1
     return score
 
 def creation_obstacles() -> list:
@@ -89,24 +83,24 @@ def creation_obstacles() -> list:
 
     #Créer la liste sans avoir de boules qui dépassent de la zone de jeu
     while nbr != 15 :
-        rond = ['RON',randint(0,1220),randint(0,1029), choice([25,50,75,100,125,150]), 'black'+str(nbr)]
-        if rond[1] - rond[3] > 0 and rond[2] + rond[3] < 1029 and rond[1] - rond[3] > 0  and rond[1] + rond[3] < 1220 :
+        rond = Boule(randint(0,1220),randint(0,1029), choice([25,50,75,100,125,150]), 'black'+str(nbr))
+        if rond.x - rond.rayon > 0 and rond.y + rond.rayon < 1029 and rond.x - rond.rayon > 0  and rond.y + rond.rayon < 1220 :
             obstacles.append(rond)
-            cercle(rond[1],rond[2],rond[3],'black','black',tag=rond[4])
+            cercle(rond.x,rond.y,rond.rayon,'black','black',tag=rond.tag)
             nbr += 1
         mise_a_jour()
     return obstacles
 
 def affiche_cercles(lst, couleur) :
     for o in lst :
-        cercle(o[0],o[1],o[2],remplissage=couleur,tag=o[3])
+        cercle(o.x,o.y,o.rayon,remplissage=couleur,tag=o.tag)
 
 def affiche_obstacles(lst) :
     for o in lst :
-        if o[0] == 'RON' :
-            cercle(o[1],o[2],o[3],tag=o[4],remplissage='black')
-        if o[0] == 'CAR' :
-            rectangle(o[1],o[2],o[3],o[4],tag=o[5],remplissage='black')
+        if isinstance(o, Boule) :
+            cercle(o.x,o.y,o.rayon,tag=o.tag,remplissage='black')
+        if isinstance(o, Carre) :
+            rectangle(o.x,o.y,o.x2,o.y2,tag=o.tag,remplissage='black')
 
 
 def calcul_obstacles(Ox,Oy,rayon,liste_obstacle) -> bool:
@@ -125,14 +119,14 @@ def calcul_obstacles(Ox,Oy,rayon,liste_obstacle) -> bool:
     True si la boule ne touche pas
     """
     for h in range(len(liste_obstacle)):
-            if liste_obstacle[h][0] == 'RON' :
-                if sqrt((liste_obstacle[h][1]-Ox)**2 + (liste_obstacle[h][2]-Oy)**2) < liste_obstacle[h][3] + rayon:
+            if isinstance(liste_obstacle[h], Boule)  :
+                if point_dans_boule(liste_obstacle[h], Ox, Oy, rayon):
                     return False
-            elif liste_obstacle[h][0] == 'CAR' :
+            elif isinstance(liste_obstacle[h], Carre) :
                 for x in range (int(Ox-rayon),int(Ox+rayon)+1):
                     for y in range(int(Oy-rayon),int(Oy+rayon)+1):
                         if sqrt((x-Ox)**2 + (y-Oy)**2) <= rayon :
-                            if liste_obstacle[h][1] < x < liste_obstacle[h][3] and liste_obstacle[h][2] < y < liste_obstacle[h][4] :
+                            if liste_obstacle[h].x < x < liste_obstacle[h].x2 and liste_obstacle[h].y < y < liste_obstacle[h].y2 :
                                 return False
     return True
 
@@ -168,8 +162,8 @@ def affiche_fenetre_timer (joueur,variantes,lst_bouleJ1,lst_bouleJ2,couleurJ1,co
                 if variantes[1] == True :
                     if nom_touche == 's':
                         debuttimer = time()
-                        ScoreFinJ1 = len(calcul_score(lst_bouleJ1))
-                        ScoreFinJ2 = len(calcul_score(lst_bouleJ2))
+                        ScoreFinJ1 = calcul_score(tuple(lst_bouleJ1))
+                        ScoreFinJ2 = calcul_score(tuple(lst_bouleJ2))
                         texte(1320,535,"J1 :  "+str(ScoreFinJ1),taille=20,ancrage='center', couleur=couleurJ1,police=policevar,tag="SJ1")
                         texte(1480,535,"J2 :  "+str(ScoreFinJ2),taille=20,ancrage='center', couleur=couleurJ2,police=policevar,tag="SJ2")
 
@@ -210,8 +204,8 @@ def clicOxOy(variantes,lst_bouleJ1,lst_bouleJ2,couleurJ1,couleurJ2,tour,fin_part
             if variantes[1] == True :
                 if nom_touche == 's':
                     debuttimer = time()
-                    ScoreFinJ1 = len(calcul_score(lst_bouleJ1))
-                    ScoreFinJ2 = len(calcul_score(lst_bouleJ2))
+                    ScoreFinJ1 = calcul_score(tuple(lst_bouleJ1))
+                    ScoreFinJ2 = calcul_score(tuple(lst_bouleJ2))
                     texte(1320,535,"J1 :  "+str(ScoreFinJ1),taille=20,ancrage='center', couleur=couleurJ1,police=policevar,tag="SJ1")
                     texte(1480,535,"J2 :  "+str(ScoreFinJ2),taille=20,ancrage='center', couleur=couleurJ2,police=policevar,tag="SJ2")
             if variantes[4] == True and terme == True:
@@ -276,8 +270,8 @@ def timer (fintps,variantes,lst_bouleJ1,lst_bouleJ2,couleurJ1,couleurJ2) -> int 
             if variantes[1] == True :
                 if nom_touche == 's':
                     debuttimerscore = time()
-                    ScoreFinJ1 = len(calcul_score(lst_bouleJ1))
-                    ScoreFinJ2 = len(calcul_score(lst_bouleJ2))
+                    ScoreFinJ1 = calcul_score(tuple(lst_bouleJ1))
+                    ScoreFinJ2 = calcul_score(tuple(lst_bouleJ2))
                     texte(1320,535,"J1 :  "+str(ScoreFinJ1),taille=20,ancrage='center', couleur=couleurJ1,police=policevar,tag="SJ1")
                     texte(1480,535,"J2 :  "+str(ScoreFinJ2),taille=20,ancrage='center', couleur=couleurJ2,police=policevar,tag="SJ2")
                 
@@ -406,8 +400,8 @@ def choix_taille_boules(banqueboules,couleurJ1,couleurJ2, lst_boule_J1, lst_boul
                 if variantes[1] == True :
                     if nom_touche == 's':
                         debuttimer = time()
-                        ScoreFinJ1 = len(calcul_score(lst_boule_J1))
-                        ScoreFinJ2 = len(calcul_score(lst_boule_J2))
+                        ScoreFinJ1 = calcul_score(tuple(lst_boule_J1))
+                        ScoreFinJ2 = calcul_score(tuple(lst_boule_J2))
                         texte(1320,535,"J1 :  "+str(ScoreFinJ1),taille=20,ancrage='center', couleur=couleurJ1,police=policevar,tag="SJ1")
                         texte(1480,535,"J2 :  "+str(ScoreFinJ2),taille=20,ancrage='center', couleur=couleurJ2,police=policevar,tag="SJ2")
 
@@ -462,8 +456,8 @@ def choix_taille_boules(banqueboules,couleurJ1,couleurJ2, lst_boule_J1, lst_boul
 def detection_ennemi(liste_boule_ennemi,Ox,Oy,expension):
     proche = None
     for boule in liste_boule_ennemi :
-        distance = sqrt((boule[0]-Ox)**2 + (boule[1]-Oy)**2)
-        if distance < boule[2] + expension :
+        distance = sqrt((boule.x-Ox)**2 + (boule.y-Oy)**2)
+        if distance < boule.rayon + expension :
             if proche == None :
                 proche = (distance, boule)
             elif proche[0] > distance :
@@ -491,55 +485,55 @@ def dynamique (lst_boule_J1,lst_boule_J2,couleurJ1,couleurJ2,expension,obstacles
     if obstacles == True :
         #==============CALCUL DISTANCE LST JOUEUR 1====================================================================================================================================
         for boule in lst_boule_J1 :
-            if boule[1] - boule[2] < 5 or boule[1] + boule[2] > 1024 or boule[0] - boule[2] < 5  or boule[0] + boule[2] > 1215 :
+            if boule.y - boule.rayon < 5 or boule.y + boule.rayon > 1024 or boule.x - boule.rayon < 5  or boule.x + boule.rayon > 1215 :
                 continue
-            proche = detection_ennemi(lst_boule_J2,boule[0],boule[1],boule[2]+expension) 
+            proche = detection_ennemi(lst_boule_J2,boule.x,boule.y,boule.rayon+expension) 
             #On calcule si il y a une boule proche 
             if proche != None :
                     if proche[0] <= 2.5 :
                         expension = proche[0]/2
                     else : 
                         expension = 5
-                    if calcul_obstacles(proche[1][0], proche[1][1], proche[1][2]+expension, liste_obstacle) == True and detection_ennemi(lst_boule_J1,proche[1][0], proche[1][1], proche[1][2]+expension) == None:
-                        Ox,Oy,rayon,tag = boule[0],boule[1],boule[2]+expension,boule[3]
-                        efface(boule[3])
-                        boule[2] = rayon
+                    if calcul_obstacles(proche[1].x, proche[1].y, proche[1].rayon+expension, liste_obstacle) == True and detection_ennemi(lst_boule_J1,proche[1].x, proche[1].y, proche[1].rayon+expension) == None:
+                        Ox,Oy,rayon,tag = boule.x,boule.y,boule.rayon+expension,boule.tag
+                        efface(boule.tag)
+                        boule.changer_rayon(rayon)
                         cercle(Ox,Oy,rayon,remplissage=couleurJ1,tag=tag)
-                        Ox,Oy,rayon,tag = proche[1][0], proche[1][1], proche[1][2]+expension, proche[1][3]
-                        efface(proche[1][3])
-                        boule[2] = rayon
+                        Ox,Oy,rayon,tag = proche[1].x, proche[1].y, proche[1].rayon+expension, proche[1].tag
+                        efface(proche[1].tag)
+                        boule.changer_rayon(rayon)
                         cercle(Ox,Oy,rayon,remplissage=couleurJ2,tag=tag)
             else  :
-                if calcul_obstacles(boule[0], boule[1], boule[2]+expension, liste_obstacle) == True:
-                    Ox,Oy,rayon,tag = boule[0],boule[1],boule[2]+expension,boule[3]
-                    efface(boule[3])
-                    boule[2] = rayon
+                if calcul_obstacles(boule.x, boule.y, boule.rayon+expension, liste_obstacle) == True:
+                    Ox,Oy,rayon,tag = boule.x,boule.y,boule.rayon+expension,boule.tag
+                    efface(boule.tag)
+                    boule.changer_rayon(rayon)
                     cercle(Ox,Oy,rayon,remplissage=couleurJ1,tag=tag)
         #==============CALCUL DISTANCE LST JOUEUR 2====================================================================================================================================
         for boule in lst_boule_J2 :
-            if boule[1] - boule[2] < 5 or boule[1] + boule[2] > 1024 or boule[0] - boule[2] < 5  or boule[0] + boule[2] > 1215 :
+            if boule.y - boule.rayon < 5 or boule.y + boule.rayon > 1024 or boule.x - boule.rayon < 5  or boule.x + boule.rayon > 1215 :
                 continue
-            proche = detection_ennemi(lst_boule_J1,boule[0],boule[1],boule[2]+expension) 
+            proche = detection_ennemi(lst_boule_J1,boule.x,boule.y,boule.rayon+expension) 
             #On calcule si il y a une boule proche 
             if proche != None :
                     if proche[0] <= 2.5 :
                         expension = proche[0]/2
                     else : 
                         expension = 5
-                    if calcul_obstacles(proche[1][0], proche[1][1], proche[1][2]+expension, liste_obstacle) == True and detection_ennemi(lst_boule_J2,proche[1][0], proche[1][1], proche[1][2]+expension) == None:
-                        Ox,Oy,rayon,tag = boule[0],boule[1],boule[2]+expension,boule[3]
-                        efface(boule[3])
-                        boule[2] = rayon
+                    if calcul_obstacles(proche[1].x, proche[1].y, proche[1].rayon+expension, liste_obstacle) == True and detection_ennemi(lst_boule_J2,proche[1].x, proche[1].y, proche[1].rayon+expension) == None:
+                        Ox,Oy,rayon,tag = boule.x,boule.y,boule.rayon+expension,boule.tag
+                        efface(boule.tag)
+                        boule.changer_rayon(rayon)
                         cercle(Ox,Oy,rayon,remplissage=couleurJ2,tag=tag)
-                        Ox,Oy,rayon,tag = proche[1][0], proche[1][1], proche[1][2]+expension, proche[1][3]
-                        efface(proche[1][3])
-                        boule[2] = rayon
+                        Ox,Oy,rayon,tag = proche[1].x, proche[1].y, proche[1].rayon+expension, proche[1].tag
+                        efface(proche[1].tag)
+                        boule.changer_rayon(rayon)
                         cercle(Ox,Oy,rayon,remplissage=couleurJ1,tag=tag)
             else  :
-                if calcul_obstacles(boule[0], boule[1], boule[2]+expension, liste_obstacle) == True:
-                    Ox,Oy,rayon,tag = boule[0],boule[1],boule[2]+expension,boule[3]
-                    efface(boule[3])
-                    boule[2] = rayon
+                if calcul_obstacles(boule.x, boule.y, boule.rayon+expension, liste_obstacle) == True:
+                    Ox,Oy,rayon,tag = boule.x,boule.y,boule.rayon+expension,boule.tag
+                    efface(boule.tag)
+                    boule.changer_rayon(rayon)
                     cercle(Ox,Oy,rayon,remplissage=couleurJ2,tag=tag)
 
     #============================================================================SANS OBSTACLES==========================================================================================
@@ -547,51 +541,51 @@ def dynamique (lst_boule_J1,lst_boule_J2,couleurJ1,couleurJ2,expension,obstacles
     else :
         #==============CALCUL DISTANCE LST JOUEUR 1====================================================================================================================================
         for boule in lst_boule_J1 :
-            if boule[1] - boule[2] < 5 or boule[1] + boule[2] > 1024 or boule[0] - boule[2] < 5  or boule[0] + boule[2] > 1215 :
+            if boule.y - boule.rayon < 5 or boule.y + boule.rayon > 1024 or boule.x - boule.rayon < 5  or boule.x + boule.rayon > 1215 :
                 continue
-            proche = detection_ennemi(lst_boule_J2,boule[0],boule[1],boule[2]+expension) 
+            proche = detection_ennemi(lst_boule_J2,boule.x,boule.y,boule.rayon+expension) 
             #On calcule si il y a une boule proche 
             if proche != None :
                     if proche[0] <= 2.5 :
                         expension = proche[0]/2
                     else : 
                         expension = 5
-                    if detection_ennemi(lst_boule_J1,proche[1][0], proche[1][1], proche[1][2]+expension) == None:
-                        Ox,Oy,rayon,tag = boule[0],boule[1],boule[2]+expension,boule[3]
-                        efface(boule[3])
-                        boule[2] = rayon
+                    if detection_ennemi(lst_boule_J1,proche[1].x, proche[1].y, proche[1].rayon+expension) == None:
+                        Ox,Oy,rayon,tag = boule.x,boule.y,boule.rayon+expension,boule.tag
+                        efface(boule.tag)
+                        boule.changer_rayon(rayon)
                         cercle(Ox,Oy,rayon,remplissage=couleurJ1,tag=tag)
-                        Ox,Oy,rayon,tag = proche[1][0], proche[1][1], proche[1][2]+expension, proche[1][3]
-                        efface(proche[1][3])
-                        boule[2] = rayon
+                        Ox,Oy,rayon,tag = proche[1].x, proche[1].y, proche[1].rayon+expension, proche[1].tag
+                        efface(proche[1].tag)
+                        boule.changer_rayon(rayon)
                         cercle(Ox,Oy,rayon,remplissage=couleurJ2,tag=tag)
             else  :
-                Ox,Oy,rayon,tag = boule[0],boule[1],boule[2]+expension,boule[3]
-                efface(boule[3])
-                boule[2] = rayon
+                Ox,Oy,rayon,tag = boule.x,boule.y,boule.rayon+expension,boule.tag
+                efface(boule.tag)
+                boule.changer_rayon(rayon)
                 cercle(Ox,Oy,rayon,remplissage=couleurJ1,tag=tag)
         #==============CALCUL DISTANCE LST JOUEUR 2====================================================================================================================================
         for boule in lst_boule_J2 :
-            if boule[1] - boule[2] < 5 or boule[1] + boule[2] > 1024 or boule[0] - boule[2] < 5  or boule[0] + boule[2] > 1215 :
+            if boule.y - boule.rayon < 5 or boule.y + boule.rayon > 1024 or boule.x - boule.rayon < 5  or boule.x + boule.rayon > 1215 :
                 continue
-            proche = detection_ennemi(lst_boule_J1,boule[0],boule[1],boule[2]+expension) 
+            proche = detection_ennemi(lst_boule_J1,boule.x,boule.y,boule.rayon+expension) 
             #On calcule si il y a une boule proche 
             if proche != None :
                     if proche[0] <= 2.5 :
                         expension = proche[0]/2
                     else : 
                         expension = 5
-                    if detection_ennemi(lst_boule_J2,proche[1][0], proche[1][1], proche[1][2]+expension) == None:
-                        Ox,Oy,rayon,tag = boule[0],boule[1],boule[2]+expension,boule[3]
-                        efface(boule[3])
-                        boule[2] = rayon
+                    if detection_ennemi(lst_boule_J2,proche[1].x, proche[1].y, proche[1].rayon+expension) == None:
+                        Ox,Oy,rayon,tag = boule.x,boule.y,boule.rayon+expension,boule.tag
+                        efface(boule.tag)
+                        boule.changer_rayon(rayon)
                         cercle(Ox,Oy,rayon,remplissage=couleurJ2,tag=tag)
-                        Ox,Oy,rayon,tag = proche[1][0], proche[1][1], proche[1][2]+expension, proche[1][3]
-                        efface(proche[1][3])
-                        boule[2] = rayon
+                        Ox,Oy,rayon,tag = proche[1].x, proche[1].y, proche[1].rayon+expension, proche[1].tag
+                        efface(proche[1].tag)
+                        boule.changer_rayon(rayon)
                         cercle(Ox,Oy,rayon,remplissage=couleurJ1,tag=tag)
             else  :
-                Ox,Oy,rayon,tag = boule[0],boule[1],boule[2]+expension,boule[3]
-                efface(boule[3])
-                boule[2] = rayon
+                Ox,Oy,rayon,tag = boule.x,boule.y,boule.rayon+expension,boule.tag
+                efface(boule.tag)
+                boule.changer_rayon(rayon)
                 cercle(Ox,Oy,rayon,remplissage=couleurJ2,tag=tag)

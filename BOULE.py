@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 class Boule:
     def __init__(self, x:int, y:int, rayon:int, tag:str):
         """
@@ -31,3 +33,11 @@ class Boule:
             self.rayon = rayon
         else :
             raise ValueError("Le rayon doit être positif")
+        
+@lru_cache
+def distance(Boule1: Boule, Ox:int, Oy:int):
+    return (Boule1.x - Ox)**2 + (Boule1.y - Oy)**2
+
+@lru_cache
+def point_dans_boule(Boule1: Boule, Ox:int, Oy:int, R:int = 0):
+    return distance(Boule1, Ox, Oy) < (Boule1.rayon + R)**2

@@ -6,6 +6,8 @@ from os import path
 
 # =============================================================================== NOS MODULES A NOUS ================================================================== #
 
+from BOULE import Boule, point_dans_boule
+from CARRE import Carre
 
 # ==================================================================================== FONCTIONS ====================================================================== #
 
@@ -171,7 +173,7 @@ def SPLAATOMAKER(independance):
             return
         else :
             cercle(Ox,Oy,rayon,'black','black',tag='black'+str(tour))
-            lstobs.append(['RON',Ox,Oy,rayon,'black'+str(tour)])
+            lstobs.append(Boule(Ox,Oy,rayon,'black'+str(tour)))
         mise_a_jour()
 
     def pose_carre(Ox,Oy,rayon,tour):
@@ -180,21 +182,19 @@ def SPLAATOMAKER(independance):
             return
         else :
             rectangle(Ox,Oy,Ox+rayon,Oy+rayon,'black','black',tag='black'+str(tour))
-            lstobs.append(['CAR',Ox,Oy,Ox+rayon,Oy+rayon,rayon,'black'+str(tour)])
+            lstobs.append(Carre(Ox,Oy,rayon,'black'+str(tour)))
         mise_a_jour()
 
     def calcul_effacer(x,y,lst):
         for i in range(len(lst)):
-            if lst[i][0] == 'RON' :
-                if sqrt((lst[i][1]-x)**2 + (lst[i][2]-y)**2) < lst[i][2] :
-                    efface(lst[i][4])
+            if isinstance(lst[i], Boule) :
+                if point_dans_boule(lst[i], x, y):
+                    efface(lst[i].tag)
                     lst.remove(lst[i])
                     return
-            elif lst[i][0] == 'CAR' :
-                print(x,y)
-                if lst[i][1] <= x <= lst[i][3] and lst[i][2] <= y <= lst[i][4] :
-                    print(lst[i][6])
-                    efface(lst[i][6])
+            elif isinstance(lst[i], Carre) :
+                if lst[i].x <= x <= lst[i].x2 and lst[i].y <= y <= lst[i].y2 :
+                    efface(lst[i].tag)
                     lst.remove(lst[i])
                     return
                 

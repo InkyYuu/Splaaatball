@@ -8,7 +8,7 @@ from os import listdir
 
 # =============================================================================== NOS MODULES A NOUS ================================================================== #
 
-from BOULE import Boule
+from BOULE import Boule, distance, point_dans_boule
 from COLORS import *
 from DEBUT import *
 from VARIANTES import *
@@ -16,9 +16,6 @@ from CHOIXOBS import *
 from CHOIXSAVE import *
 
 # ==================================================================================== FONCTIONS ====================================================================== #
-
-def distance(Boule1: Boule, Ox:int, Oy:int):
-    return sqrt((Boule1.x - Ox)**2 + (Boule1.y - Oy)**2)
 
 def faute (Ox,Oy,rayon,couleur_allie, text) -> None:
     """
@@ -102,8 +99,7 @@ def pose_ronds (Ox, Oy, liste_boule_allie,liste_boule_ennemi, couleur_allie, cou
     if variantes[5] != False : 
         divise = False
         for i in range(len(liste_boule_ennemi)):
-            if sqrt((liste_boule_ennemi[i][0]-Ox)**2 + (liste_boule_ennemi[i][1]-Oy)**2) < liste_boule_ennemi[i][2] :
-                divise =  True
+            divise = point_dans_boule(liste_boule_ennemi[i], Ox, Oy)
         if calcul_obstacles(Ox,Oy,rayon,liste_obstacle) == False and divise == False:
             faute(Ox,Oy,rayon,couleur_allie,'FAUTE : Obstacle')
             return
@@ -111,7 +107,7 @@ def pose_ronds (Ox, Oy, liste_boule_allie,liste_boule_ennemi, couleur_allie, cou
     #Premier rond : Ajout sans passée par le reste des cas
     if liste_boule_allie == [] and liste_boule_ennemi == []:
         cercle(Ox,Oy,rayon,'black',couleur_allie,tag='boule'+couleur_allie+str(tour))
-        liste_boule_allie.append([Ox,Oy,rayon,'boule'+couleur_allie+str(tour)])
+        liste_boule_allie.append(Boule(Ox,Oy,rayon,'boule'+couleur_allie+str(tour)))
 
     # ============================================================= Autres vérifications ========================================================== #
     
@@ -122,13 +118,13 @@ def pose_ronds (Ox, Oy, liste_boule_allie,liste_boule_ennemi, couleur_allie, cou
         for i in range(len(liste_boule_ennemi)):
 
             # ============================= Vérification si joueur appuie dans la couleur ennemie : division boule en 2 =============================== #
-            if sqrt((liste_boule_ennemi[i][0]-Ox)**2 + (liste_boule_ennemi[i][1]-Oy)**2) < liste_boule_ennemi[i][2] :
+            if point_dans_boule(liste_boule_ennemi[i], Ox, Oy) :
                 Cas3 = True
                 indice = i
                 break
 
             # ================================== Vérification si joueur intersec la couleur ennemie : interdit ======================================== #
-            elif sqrt((liste_boule_ennemi[i][0]-Ox)**2 + (liste_boule_ennemi[i][1]-Oy)**2) < liste_boule_ennemi[i][2] + rayon:
+            elif point_dans_boule(liste_boule_ennemi[i], Ox, Oy, rayon):
                 Cas2 = True
 
         # ================================================================= Rien de particulier ========================================================= #
@@ -140,7 +136,7 @@ def pose_ronds (Ox, Oy, liste_boule_allie,liste_boule_ennemi, couleur_allie, cou
         #Cas 1
         if Cas1 == True :
             cercle(Ox,Oy,rayon,'black',couleur_allie,tag='boule'+couleur_allie+str(tour))
-            liste_boule_allie.append([Ox,Oy,rayon,'boule'+couleur_allie+str(tour)])
+            liste_boule_allie.append(Boule(Ox,Oy,rayon,'boule'+couleur_allie+str(tour)))
 
         #Cas 2
         elif Cas2 == True and Cas3 == False:
@@ -150,29 +146,29 @@ def pose_ronds (Ox, Oy, liste_boule_allie,liste_boule_ennemi, couleur_allie, cou
         elif Cas3 == True :
 
             #Calcul du vecteur
-            vecteurU = [(Ox-liste_boule_ennemi[indice][0]),(Oy-liste_boule_ennemi[indice][1])]
+            vecteurU = [(Ox-liste_boule_ennemi[indice].x),(Oy-liste_boule_ennemi[indice].y)]
             normeU = sqrt((vecteurU[0]**2)+vecteurU[1]**2)
 
             #Calcul du nouveau rayon
-            rayon_bouleclic = liste_boule_ennemi[indice][2]- normeU
+            rayon_bouleclic = liste_boule_ennemi[indice].rayon- normeU
             rayon_boulerestante = normeU
 
             #Calcul des coordonnées de la nouvelle boule non choisie
             if rayon_boulerestante == 0 :
                 return
-            NewOx = (liste_boule_ennemi[indice][0])-((rayon_bouleclic/rayon_boulerestante)*(Ox-liste_boule_ennemi[indice][0]))
-            NewOy = (liste_boule_ennemi[indice][1])-((rayon_bouleclic/rayon_boulerestante)*(Oy-liste_boule_ennemi[indice][1]))
+            NewOx = (liste_boule_ennemi[indice].x)-((rayon_bouleclic/rayon_boulerestante)*(Ox-liste_boule_ennemi[indice].x))
+            NewOy = (liste_boule_ennemi[indice].y)-((rayon_bouleclic/rayon_boulerestante)*(Oy-liste_boule_ennemi[indice].y))
 
             #Nouvelles sous-boules
             cercle(Ox,Oy,rayon_bouleclic,'black',couleur_ennemi,tag='boule'+couleur_ennemi+str(tour)+'A')
             cercle(NewOx,NewOy,rayon_boulerestante,'black',couleur_ennemi,tag='boule'+couleur_ennemi+str(tour)+'B')
             
             #Ajout des informations à la liste
-            liste_boule_ennemi.append([Ox,Oy,rayon_bouleclic,'boule'+couleur_ennemi+str(tour)+'A'])
-            liste_boule_ennemi.append([NewOx,NewOy,rayon_boulerestante,'boule'+couleur_ennemi+str(tour)+'B'])
+            liste_boule_ennemi.append(Boule(Ox,Oy,rayon_bouleclic,'boule'+couleur_ennemi+str(tour)+'A'))
+            liste_boule_ennemi.append(Boule(NewOx,NewOy,rayon_boulerestante,'boule'+couleur_ennemi+str(tour)+'B'))
 
             #Suppression ancienne boule et ancien score (soustraction)
-            efface(liste_boule_ennemi[indice][3])
+            efface(liste_boule_ennemi[indice].tag)
             liste_boule_ennemi.pop(indice)
             
     mise_a_jour()
@@ -415,8 +411,8 @@ def main():
     # ============================================================================= AFFICHAGE DES SCORES ======================================================================= #
 
     while fin==True :
-        ScoreFinJ1 = len(calcul_score(lst_boule_J1))
-        ScoreFinJ2 = len(calcul_score(lst_boule_J2))
+        ScoreFinJ1 = calcul_score(tuple(lst_boule_J1))
+        ScoreFinJ2 = calcul_score(tuple(lst_boule_J2))
 
         #Victoire J1
         if ScoreFinJ1 > ScoreFinJ2 :
