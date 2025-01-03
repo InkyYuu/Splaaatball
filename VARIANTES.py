@@ -64,13 +64,22 @@ def calcul_score(tuple_boule) -> int :
     Fonctionnement :
     La fonction vérifie si le pixel appartient aux ronds du joueurs et renvoie le score total cumulé
     """
-    score = 0
-    for boule in tuple_boule :
-        for x in range (int(boule.x - boule.rayon),int(boule.x + boule.rayon)+1):
-            for y in range (int(boule.y - boule.rayon),int(boule.y + boule.rayon)+1):
-                if point_dans_boule(boule, x, y) :
-                    score += 1
-    return score
+    pixels = {} 
+
+    for boule in tuple_boule:
+        rayon_carre = boule.rayon ** 2
+        y_min, y_max = int(boule.y - boule.rayon), int(boule.y + boule.rayon)
+
+        for y in range(y_min, y_max + 1):
+            delta = rayon_carre - (y - boule.y) ** 2
+            if delta < 0:
+                continue
+            dx = int(delta ** 0.5)
+            x_s, x_e = boule.x - dx, boule.x + dx
+            for x in range(int(x_s), int(x_e) + 1):
+                pixels[(x, y)] = True 
+
+    return len(pixels)
 
 def creation_obstacles() -> list:
     """
