@@ -1,95 +1,95 @@
 Top 10 des fonctions les plus couteuses (temps cumule) :
-Thu Jan  2 13:23:50 2025    analyses/pOBS.stats
+Thu Jan  2 11:54:05 2025    analyses/p.stats
 
-         67032 function calls (66880 primitive calls) in 2.652 seconds
+         3687728 function calls (3687590 primitive calls) in 81.999 seconds
 
    Ordered by: cumulative time
-   List reduced from 407 to 20 due to restriction <20>
+   List reduced from 416 to 20 due to restriction <20>
 
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-        2    0.000    0.000    5.264    2.632 SPLAAATBALL.py:1(<module>)
-     20/1    0.000    0.000    2.652    2.652 {built-in method builtins.exec}
-     27/6    0.000    0.000    2.652    0.442 <frozen importlib._bootstrap>:1349(_find_and_load)
-     27/6    0.000    0.000    2.652    0.442 <frozen importlib._bootstrap>:1304(_find_and_load_unlocked)
-     26/6    0.000    0.000    2.647    0.441 <frozen importlib._bootstrap>:911(_load_unlocked)
-     18/6    0.000    0.000    2.647    0.441 <frozen importlib._bootstrap_external>:989(exec_module)
-    55/12    0.000    0.000    2.634    0.219 <frozen importlib._bootstrap>:480(_call_with_frames_removed)
-        1    0.000    0.000    2.617    2.617 VARIANTES.py:1(<module>)
-     5461    2.488    0.000    2.494    0.000 {method 'call' of '_tkinter.tkapp' objects}
-      249    0.001    0.000    1.357    0.005 __init__.py:1370(update)
-        2    0.005    0.003    1.355    0.678 COLORS.py:9(choixcouleur)
-      248    0.000    0.000    1.331    0.005 upemtk.py:156(mise_a_jour)
-      248    0.001    0.000    1.330    0.005 upemtk.py:72(update)
-        1    0.002    0.002    1.209    1.209 DEBUT.py:8(debut)
-      788    0.003    0.000    0.663    0.001 upemtk.py:383(texte)
-      115    0.001    0.000    0.470    0.004 upemtk.py:360(image)
-      789    0.006    0.000    0.450    0.001 upemtk.py:68(set_font)
-      115    0.001    0.000    0.420    0.004 __init__.py:4146(__init__)
-      115    0.001    0.000    0.420    0.004 __init__.py:4085(__init__)
-     1569    0.009    0.000    0.291    0.000 __init__.py:2842(_create)
+     18/1    0.000    0.000   81.999   81.999 {built-in method builtins.exec}
+        1    0.017    0.017   81.999   81.999 SPLAAATBALL.py:1(<module>)
+   427690   79.122    0.000   79.247    0.000 {method 'call' of '_tkinter.tkapp' objects}
+   243375    0.090    0.000   55.008    0.000 upemtk.py:156(mise_a_jour)
+   243375    0.111    0.000   54.919    0.000 upemtk.py:72(update)
+   243376    0.153    0.000   54.835    0.000 __init__.py:1370(update)
+       34    0.198    0.006   28.991    0.853 VARIANTES.py:223(timer)
+    30467    0.087    0.000   23.556    0.001 upemtk.py:383(texte)
+       34    0.177    0.005   21.800    0.641 VARIANTES.py:127(affiche_fenetre_timer)
+    30468    0.174    0.000   15.618    0.001 upemtk.py:68(set_font)
+       12    0.116    0.010   13.062    1.089 VARIANTES.py:283(terminaison)
+        1    0.006    0.006    8.874    8.874 DEBUT.py:8(debut)
+    30468    0.186    0.000    8.036    0.000 font.py:69(__init__)
+    32674    0.164    0.000    7.984    0.000 __init__.py:2842(_create)
+    30467    0.027    0.000    7.855    0.000 __init__.py:2882(create_text)
+    30468    0.085    0.000    7.361    0.000 font.py:163(metrics)
+        2    0.011    0.005    4.570    2.285 COLORS.py:9(choixcouleur)
+        3    0.031    0.010    4.362    1.454 upemtk.py:466(attente_clic)
+        2    0.000    0.000    2.572    1.286 SPLAAATBALL.py:19(faute)
+        1    0.000    0.000    2.145    2.145 CHOIXSAVE.py:9(choixsave)
 
 
 
 Top 10 des fonctions les plus couteuses (temps total) :
-Thu Jan  2 13:23:50 2025    analyses/pOBS.stats
+Thu Jan  2 11:54:05 2025    analyses/p.stats
 
-         67032 function calls (66880 primitive calls) in 2.652 seconds
+         3687728 function calls (3687590 primitive calls) in 81.999 seconds
 
    Ordered by: internal time
-   List reduced from 407 to 20 due to restriction <20>
+   List reduced from 416 to 20 due to restriction <20>
 
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-     5461    2.488    0.000    2.494    0.000 {method 'call' of '_tkinter.tkapp' objects}
-        1    0.029    0.029    0.029    0.029 {built-in method _tkinter.create}
-       86    0.016    0.000    0.016    0.000 {built-in method posix.stat}
-       18    0.011    0.001    0.011    0.001 {built-in method _io.open_code}
-     1571    0.009    0.000    0.017    0.000 __init__.py:1543(_options)
-     1569    0.009    0.000    0.291    0.000 __init__.py:2842(_create)
-       18    0.007    0.000    0.007    0.000 {method 'read' of '_io.BufferedReader' objects}
-      789    0.006    0.000    0.450    0.001 upemtk.py:68(set_font)
-      789    0.006    0.000    0.240    0.000 font.py:69(__init__)
-       21    0.005    0.000    0.005    0.000 {method '__exit__' of '_io._IOBase' objects}
-        3    0.005    0.002    0.005    0.002 {built-in method _io.open}
-        2    0.005    0.003    1.355    0.678 COLORS.py:9(choixcouleur)
-    12485    0.003    0.000    0.003    0.000 {built-in method builtins.isinstance}
-     1572    0.003    0.000    0.006    0.000 __init__.py:102(_cnfmerge)
-      788    0.003    0.000    0.663    0.001 upemtk.py:383(texte)
-      789    0.002    0.000    0.202    0.000 font.py:163(metrics)
-     3294    0.002    0.000    0.002    0.000 {method 'getint' of '_tkinter.tkapp' objects}
-        5    0.002    0.000    0.002    0.000 {method 'readline' of '_io.TextIOWrapper' objects}
-        1    0.002    0.002    1.209    1.209 DEBUT.py:8(debut)
-       72    0.002    0.000    0.005    0.000 __init__.py:1622(_substitute)
+   427690   79.122    0.000   79.247    0.000 {method 'call' of '_tkinter.tkapp' objects}
+       34    0.198    0.006   28.991    0.853 VARIANTES.py:223(timer)
+    30468    0.186    0.000    8.036    0.000 font.py:69(__init__)
+       34    0.177    0.005   21.800    0.641 VARIANTES.py:127(affiche_fenetre_timer)
+    32676    0.174    0.000    0.330    0.000 __init__.py:1543(_options)
+    30468    0.174    0.000   15.618    0.001 upemtk.py:68(set_font)
+    32674    0.164    0.000    7.984    0.000 __init__.py:2842(_create)
+   243376    0.153    0.000   54.835    0.000 __init__.py:1370(update)
+   243383    0.121    0.000    0.185    0.000 upemtk.py:554(donne_evenement)
+       12    0.116    0.010   13.062    1.089 VARIANTES.py:283(terminaison)
+   243375    0.111    0.000   54.919    0.000 upemtk.py:72(update)
+   243375    0.090    0.000   55.008    0.000 upemtk.py:156(mise_a_jour)
+        2    0.087    0.044    0.141    0.071 VARIANTES.py:53(calcul_score)
+    30467    0.087    0.000   23.556    0.001 upemtk.py:383(texte)
+    30468    0.085    0.000    7.361    0.000 font.py:163(metrics)
+248593/248589    0.065    0.000    0.065    0.000 {built-in method builtins.len}
+    14078    0.065    0.000    0.065    0.000 {built-in method builtins.round}
+    32677    0.062    0.000    0.103    0.000 __init__.py:102(_cnfmerge)
+   259895    0.061    0.000    0.061    0.000 {built-in method builtins.isinstance}
+    92678    0.059    0.000    0.059    0.000 {method 'getint' of '_tkinter.tkapp' objects}
 
 
 
 Top 10 des fonctions les plus appelees :
-Thu Jan  2 13:23:50 2025    analyses/pOBS.stats
+Thu Jan  2 11:54:05 2025    analyses/p.stats
 
-         67032 function calls (66880 primitive calls) in 2.652 seconds
+         3687728 function calls (3687590 primitive calls) in 81.999 seconds
 
    Ordered by: call count
-   List reduced from 407 to 20 due to restriction <20>
+   List reduced from 416 to 20 due to restriction <20>
 
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-    12485    0.003    0.000    0.003    0.000 {built-in method builtins.isinstance}
-     6954    0.001    0.000    0.001    0.000 {built-in method builtins.callable}
-     5461    2.488    0.000    2.494    0.000 {method 'call' of '_tkinter.tkapp' objects}
-     3294    0.002    0.000    0.002    0.000 {method 'getint' of '_tkinter.tkapp' objects}
-     3145    0.001    0.000    0.001    0.000 {method 'update' of 'dict' objects}
-     3139    0.002    0.000    0.002    0.000 {built-in method _tkinter._flatten}
-     1697    0.001    0.000    0.001    0.000 {method 'items' of 'dict' objects}
-     1572    0.003    0.000    0.006    0.000 __init__.py:102(_cnfmerge)
-     1571    0.009    0.000    0.017    0.000 __init__.py:1543(_options)
-     1569    0.009    0.000    0.291    0.000 __init__.py:2842(_create)
-     1234    0.001    0.000    0.001    0.000 {built-in method builtins.getattr}
-     1139    0.000    0.000    0.000    0.000 {method 'append' of 'list' objects}
-1042/1038    0.000    0.000    0.000    0.000 {built-in method builtins.len}
-      815    0.000    0.000    0.000    0.000 {method 'pop' of 'dict' objects}
-      792    0.000    0.000    0.001    0.000 __init__.py:1628(getint_event)
-      789    0.001    0.000    0.001    0.000 {built-in method builtins.next}
-      789    0.006    0.000    0.240    0.000 font.py:69(__init__)
-      789    0.002    0.000    0.202    0.000 font.py:163(metrics)
-      789    0.000    0.000    0.000    0.000 {method 'splitlist' of '_tkinter.tkapp' objects}
-      789    0.001    0.000    0.001    0.000 font.py:57(_get)
+   427690   79.122    0.000   79.247    0.000 {method 'call' of '_tkinter.tkapp' objects}
+   259895    0.061    0.000    0.061    0.000 {built-in method builtins.isinstance}
+   256378    0.019    0.000    0.019    0.000 {built-in method math.sqrt}
+248593/248589    0.065    0.000    0.065    0.000 {built-in method builtins.len}
+   243383    0.043    0.000    0.043    0.000 upemtk.py:568(type_evenement)
+   243383    0.121    0.000    0.185    0.000 upemtk.py:554(donne_evenement)
+   243376    0.153    0.000   54.835    0.000 __init__.py:1370(update)
+   243375    0.111    0.000   54.919    0.000 upemtk.py:72(update)
+   243375    0.090    0.000   55.008    0.000 upemtk.py:156(mise_a_jour)
+   196118    0.035    0.000    0.035    0.000 {method 'add' of 'set' objects}
+   160776    0.017    0.000    0.017    0.000 {built-in method builtins.callable}
+    92678    0.059    0.000    0.059    0.000 {method 'getint' of '_tkinter.tkapp' objects}
+    65354    0.024    0.000    0.024    0.000 {method 'update' of 'dict' objects}
+    65349    0.026    0.000    0.026    0.000 {built-in method _tkinter._flatten}
+    33078    0.010    0.000    0.010    0.000 {method 'items' of 'dict' objects}
+    33052    0.007    0.000    0.007    0.000 {method 'append' of 'list' objects}
+    32677    0.062    0.000    0.103    0.000 __init__.py:102(_cnfmerge)
+    32676    0.174    0.000    0.330    0.000 __init__.py:1543(_options)
+    32674    0.164    0.000    7.984    0.000 __init__.py:2842(_create)
+    31167    0.016    0.000    0.016    0.000 {built-in method builtins.getattr}
 
 

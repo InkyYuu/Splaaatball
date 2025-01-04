@@ -2,7 +2,7 @@ import pstats
 
 # Charger les statistiques
 # analyses/ le  .stats
-p = pstats.Stats('analyses/profiling_results.stats') 
+p = pstats.Stats('analyses/p.stats') 
 
 # Nettoyage des chemins pour plus de visibilité
 p.strip_dirs()
@@ -19,7 +19,7 @@ p.sort_stats("time").print_stats(20)
 print("\nTop 10 des fonctions les plus appelées :")
 p.sort_stats("ncalls").print_stats(20)
 
-with open("analyses/rapport_stats_APRES.txt", "w") as f:
+with open("analyses/rapport_stats_AVANT.txt", "w") as f:
     # Rediriger la sortie vers le fichier
     p.stream = f
     
@@ -36,4 +36,4 @@ with open("analyses/rapport_stats_APRES.txt", "w") as f:
     p.sort_stats("ncalls").print_stats(20)
 
 # Nom du rapport à generer
-print("Rapport complet genere dans 'rapport_stats_APRES.txt'.")
+print("Rapport complet genere dans 'rapport_stats_AVANT.txt'.")
